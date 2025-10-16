@@ -1,0 +1,11 @@
+{
+  "id": 3,
+  "name": "上海宋庆龄故居纪念馆",
+  "name_en": "Sun Yat-sen's Former Residence",
+  "area": "黄浦区",
+  "theme": ["伟人故居", "文化名人"],
+  "rating": 4.8,
+  "description": "宋庆龄长期居住和从事国务活动的地方，馆内保留了她生前的原貌，充满了浓厚的历史气息。",
+  "description_en": "The place where Soong Ching-ling lived and engaged in state affairs for a long time. The museum preserves its original appearance during her lifetime and is full of rich historical atmosphere.",
+  "image_url": "image.jpg"
+}

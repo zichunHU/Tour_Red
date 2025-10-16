@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "name": "中国共产党第一次全国代表大会会址纪念馆",
+  "name_en": "Memorial for the Site of the First National Congress of the Communist Party of China",
+  "area": "黄浦区",
+  "theme": ["革命足迹", "建党伟业"],
+  "rating": 5,
+  "description": "中国共产党的诞生地，一幢典型的石库门建筑，见证了中国历史上开天辟地的大事变。",
+  "description_en": "The birthplace of the Communist Party of China, a typical Shikumen building that witnessed a world-changing event in Chinese history.",
+  "image_url": "image.jpg"
+}

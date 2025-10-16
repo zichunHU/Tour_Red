@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, onMounted } from 'vue'
 
@@ -16,6 +15,9 @@ const selectedTheme = ref('')
 const areaOptions = ['黄浦区', '徐汇区']
 const themeOptions = ['革命足迹', '建党伟业', '革命烈士', '抗日战争', '伟人故居', '文化名人']
 
+// Backend URL
+const backendUrl = 'http://127.0.0.1:5000';
+
 // Reusable function to fetch attractions based on current filters
 const fetchAttractions = async () => {
   loading.value = true
@@ -27,7 +29,7 @@ const fetchAttractions = async () => {
     if (selectedArea.value) params.append('area', selectedArea.value)
     if (selectedTheme.value) params.append('theme', selectedTheme.value)
     
-    const response = await fetch(`http://127.0.0.1:5000/api/attractions?${params.toString()}`)
+    const response = await fetch(`${backendUrl}/api/attractions?${params.toString()}`)
     if (!response.ok) {
       throw new Error('Network response was not ok')
     }
@@ -93,9 +95,12 @@ const handleReset = () => {
       <p v-if="attractions.length === 0" class="no-results">没有找到符合条件的景点。</p>
       <router-link v-else v-for="attraction in attractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="card-link">
         <div class="card">
-          <h3>{{ attraction.name }}</h3>
-          <p class="description">{{ attraction.description }}</p>
-          <small class="area-tag">{{ attraction.area }}</small>
+          <img v-if="attraction.image_url" :src="backendUrl + attraction.image_url" :alt="attraction.name" class="card-image">
+          <div class="card-content">
+            <h3>{{ attraction.name }}</h3>
+            <p class="description">{{ attraction.description }}</p>
+            <small class="area-tag">{{ attraction.area }}</small>
+          </div>
         </div>
       </router-link>
     </section>
@@ -191,6 +196,7 @@ const handleReset = () => {
 /* Attractions List */
 .attractions-list {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
@@ -202,12 +208,12 @@ const handleReset = () => {
 
 .card {
   background-color: var(--card-background-color);
-  padding: 2rem;
   border-radius: var(--card-border-radius);
   box-shadow: var(--card-shadow);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   height: 100%;
   box-sizing: border-box;
+  overflow: hidden; /* Ensures image corners are clipped */
 }
 
 .card:hover {
@@ -215,9 +221,20 @@ const handleReset = () => {
   box-shadow: 0 8px 20px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.07);
 }
 
+.card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
 .card h3 {
   margin-top: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem; /* Slightly smaller to fit better */
   font-weight: 600;
   color: var(--accent-color);
 }
@@ -225,6 +242,7 @@ const handleReset = () => {
 .card .description {
   color: var(--secondary-text-color);
   line-height: 1.6;
+  font-size: 0.9rem;
 }
 
 .card .area-tag {
@@ -235,6 +253,7 @@ const handleReset = () => {
   color: var(--secondary-text-color);
   border-radius: 8px;
   font-weight: 500;
+  font-size: 0.8rem;
 }
 
 .error-message {

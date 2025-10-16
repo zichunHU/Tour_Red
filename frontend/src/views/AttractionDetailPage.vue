@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -10,10 +9,12 @@ const attraction = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
+const backendUrl = 'http://127.0.0.1:5000';
+
 onMounted(async () => {
   const attractionId = route.params.id
   try {
-    const response = await fetch(`http://127.0.0.1:5000/api/attractions/${attractionId}`)
+    const response = await fetch(`${backendUrl}/api/attractions/${attractionId}`)
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error('Attraction not found')
@@ -40,6 +41,8 @@ const goBack = () => {
     <div v-if="error" class="error-message">加载失败: {{ error }}</div>
 
     <article v-if="attraction" class="detail-card">
+      <img v-if="attraction.image_url" :src="backendUrl + attraction.image_url" :alt="attraction.name" class="detail-hero-image">
+      
       <header class="detail-header">
         <button @click="goBack" class="back-button">&larr; 返回列表</button>
         <h1>{{ attraction.name }}</h1>
@@ -74,6 +77,14 @@ const goBack = () => {
   border-radius: var(--card-border-radius);
   box-shadow: var(--card-shadow);
   overflow: hidden; /* Ensures child elements respect the border radius */
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.detail-hero-image {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
 }
 
 .detail-header {

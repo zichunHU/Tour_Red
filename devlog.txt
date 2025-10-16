@@ -1,0 +1,115 @@
+
+### **开发日志 (Development Log)**
+
+**项目:** "红色印记：上海红色文旅双语导览平台"
+**日期:** 2025年10月16日
+**阶段:** 项目初始化与基本框架搭建
+
+*   **[分析] 需求与架构分析:**
+    *   阅读并理解了 `struct.txt` (技术架构)，明确了采用 `Vue.js` (前端) + `Python` (后端) + `JSON文件` (数据存储) 的技术路线。
+    *   阅读并理解了 `task.txt` (项目需求)，明确了项目的功能目标，如智能推荐、关键词串联、双语支持等。
+
+*   **[执行] 后端框架搭建:**
+    *   创建了 `backend/data` 目录结构。
+    *   创建了 `backend/requirements.txt` 并添加了 `Flask` 和 `Flask-Cors` 依赖。
+    *   创建了 `backend/main.py`，并初始化了一个基础的、支持跨域 (CORS) 的 Flask Web 服务。
+    *   在 `backend/data/` 目录下创建了 `attractions.json`, `routes.json`, `users.json` 三个空的JSON文件作为初始数据源。
+
+*   **[执行] 前端框架搭建:**
+    *   创建了 `frontend/src` 目录结构。
+    *   创建了 `frontend/package.json`，配置了 `Vite` 作为构建工具，并添加了 `vue` 依赖。
+    *   创建了前端入口页面 `frontend/index.html` 和 Vue 初始化脚本 `frontend/src/main.js`。
+    *   创建了 Vue 的根组件 `frontend/src/App.vue`。
+
+*   **[修复] 前端启动问题:**
+    *   **问题:** `npm run dev` 启动时，Vite 报错 `Failed to parse source for import analysis`，无法处理 `.vue` 文件。
+    *   **原因:** 忘记创建 Vite 配置文件来启用 Vue 插件。
+    *   **解决:** 创建并配置了 `frontend/vite.config.js` 文件，在其中引入并使用了 `@vitejs/plugin-vue` 插件，问题解决。
+
+*   **[执行] 实现景点列表功能 (端到端):**
+    *   **数据:** 向 `backend/data/attractions.json` 添加了示例数据。
+    *   **后端:** 在 `backend/main.py` 中创建了 `/api/attractions` API 接口，用于读取并返回景点数据。
+    *   **前端:** 修改了 `frontend/src/App.vue`，实现了从后端获取数据、处理加载/错误状态，并使用 `v-for` 将景点列表渲染到页面上。
+    *   **结果:** 成功打通前后端，实现了第一个核心功能的垂直切片。
+
+*   **[执行] 集成 Vue Router 并重构前端结构:**
+    *   **安装:** 在 `frontend` 目录中安装了 `vue-router`。
+    *   **结构:** 创建了 `src/views` 和 `src/router` 目录。
+    *   **页面:** 创建了6个核心页面的组件文件（`HomePage`, `AttractionListPage` 等）。
+    *   **迁移:** 将景点列表的获取和显示逻辑从 `App.vue` 迁移到了 `views/AttractionListPage.vue`。
+    *   **配置:** 创建了 `router/index.js` 配置文件，定义了所有页面的路由。
+    *   **集成:** 修改了 `main.js` 以启用 `vue-router`。
+    *   **布局:** 重构了 `App.vue`，使其成为包含全局导航栏和 `<router-view>` 的主布局文件。
+    *   **结果:** 应用现在是单页应用（SPA），具备了多页面导航能力。
+
+*   **[执行] 前端界面美化 (Apple Design):**
+    *   **全局样式 (`App.vue`):**
+        *   引入了类似 Apple Design 的设计系统变量（颜色、字体、圆角、阴影）。
+        *   导航栏采用白色背景、底部边框和柔和阴影，提升了层次感。
+        *   优化了导航链接的字体、颜色和激活状态，使其更清晰、更精致。
+        *   更新了全局背景色和字体，提升了整体的视觉清晰度。
+    *   **景点列表页 (`AttractionListPage.vue`):**
+        *   重新设计了景点卡片，应用了更大的圆角 (`16px`) 和更柔和、更具层次感的阴影。
+        *   增加了卡片的鼠标悬浮（hover）动效，提升了交互感。
+        *   优化了卡片内部的文字排版和间距，使内容更易读。
+        *   为“地区”标签添加了独立的样式，使其成为一个标签元素。
+
+*   **[执行] 完成景点详情功能闭环:**
+    *   **前端 (列表页):** 修改了 `AttractionListPage.vue`，使用 `<router-link>` 将每个景点卡片转换为指向详情页的动态链接。
+    *   **后端 (API):** 在 `main.py` 中新增了 `/api/attractions/<int:attraction_id>` 接口，用于根据ID查找并返回单个景点的数据。
+    *   **前端 (详情页):** 完整实现了 `AttractionDetailPage.vue`。该页面能从URL中获取ID，调用后端接口获取数据，并以符合设计风格的布局展示景点名称、标签、中英文介绍等详细信息。添加了“返回列表”按钮。
+    *   **结果:** 成功完成了“浏览列表 -> 点击 -> 查看详情”的核心用户流程。
+
+*   **[执行] 实现景点列表的搜索与筛选功能:**
+    *   **前端 (UI):** 在 `AttractionListPage.vue` 中添加了用于关键词搜索的输入框，以及按“区域”和“主题”筛选的下拉菜单。
+    *   **前端 (逻辑):** 重构了数据获取逻辑，现在可以根据用户输入构建查询URL（如 `?keyword=...&area=...`）并向后端请求数据。
+    *   **后端 (API):** 升级了 `/api/attractions` 接口，使其能够解析URL查询参数，并根据参数（`keyword`, `area`, `theme`）对景点数据进行动态筛选，最后返回筛选后的结果。
+    *   **结果:** “景点列表页”的核心交互功能已完成，用户可以方便地查找特定景点。
+
+核心页面设计
+
+   1. `HomePage` (首页)
+       * 用途: 应用的门户和主入口。展示欢迎区、特色推荐和智能搜索功能。
+       * 路径: /
+
+   2. `AttractionListPage` (景点列表页)
+       * 用途: 展示所有景点的列表，提供筛选和排序功能。
+       * 路径: /attractions
+
+   3. `AttractionDetailPage` (景点详情页)
+       * 用途: 展示单个景点的详细信息，包括介绍、图集、地图等。
+       * 路径: /attractions/:id (例如 /attractions/1)
+
+   4. `RouteListPage` (路线列表页)
+       * 用途: 展示所有预设的推荐路线。
+       * 路径: /routes
+
+   5. `RouteDetailPage` (路线详情页)
+       * 用途: 展示单条路线的详细信息，包含的景点、地图轨迹等。
+       * 路径: /routes/:id (例如 /routes/1)
+
+   6. `PersonalizationPage` (个性化定制页)
+       * 用途: 供用户通过交互式操作，创建自己的专属游览路线。
+       * 路径: /customize
+
+  页面关系与导航流程
+
+  我们可以用下面的结构图来表示页面之间的跳转关系：
+
+    1 / (首页)
+    2  │
+    3  ├──> /attractions (景点列表页)
+    4  │      │
+    5  │      └──> /attractions/:id (景点详情页)
+    6  │
+    7  ├──> /routes (路线列表页)
+    8  │      │
+    9  │      └──> /routes/:id (路线详情页)
+   10  │            │
+   11  │            └──> (可点击进入路线中包含的) /attractions/:id
+      (景点详情页)
+   12  │
+   13  ├──> /customize (个性化定制页)
+   14  │
+   15  └──> (首页上的推荐内容也可以直接跳转到) /attractions/:id 或
+      /routes/:id

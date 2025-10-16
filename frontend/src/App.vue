@@ -6,6 +6,9 @@
         <router-link to="/attractions">景点列表</router-link>
         <router-link to="/routes">路线列表</router-link>
         <router-link to="/customize">个性化定制</router-link>
+
+        <span class="nav-separator">|</span>
+        <router-link to="/admin">后台管理</router-link>
       </nav>
     </header>
     <main>
@@ -66,5 +69,10 @@ body {
   max-width: 960px;
   margin: 2rem auto;
   padding: 1rem;
+}
+
+.nav-separator {
+  color: var(--border-color);
+  margin: 0 0.5rem;
 }
 </style>

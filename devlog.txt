@@ -1,4 +1,3 @@
-
 ### **开发日志 (Development Log)**
 
 **项目:** "红色印记：上海红色文旅双语导览平台"
@@ -73,50 +72,35 @@
     *   **前端 (详情页):** 实现了 `RouteDetailPage.vue`，用于展示单条路线的详细信息，并列出其中包含的所有景点（可点击跳转）。
     *   **结果:** 成功完成了“浏览路线 -> 点击 -> 查看路线详情（含景点列表）”的核心用户流程，应用内容得到扩充。
 
-核心页面设计
+---
 
-   1. `HomePage` (首页)
-       * 用途: 应用的门户和主入口。展示欢迎区、特色推荐和智能搜索功能。
-       * 路径: /
+**日期:** 2025年10月16日 (续)
+**阶段:** 核心功能增强与架构重构
 
-   2. `AttractionListPage` (景点列表页)
-       * 用途: 展示所有景点的列表，提供筛选和排序功能。
-       * 路径: /attractions
+*   **[重构] 数据存储结构升级:**
+    *   **动机:** 为了支持更丰富的景点内容（如多张图片），将原有的单一 `attractions.json` 文件废弃。
+    *   **方案:** 每个景点现在拥有一个独立的文件夹（以英文缩写命名），其中包含 `data.json` 文件和相关的图片资源。
+    *   **执行:** 创建了 `backend/data/attractions` 目录，并为现有景点数据创建了对应的子目录和文件，旧的 `attractions.json` 已被删除。
 
-   3. `AttractionDetailPage` (景点详情页)
-       * 用途: 展示单个景点的详细信息，包括介绍、图集、地图等。
-       * 路径: /attractions/:id (例如 /attractions/1)
+*   **[执行] 实现图文混排功能:**
+    *   **后端:** 重写了后端API，使其能够从新的目录结构中读取数据，并配置了静态文件服务以提供图片。
+    *   **前端 (列表页):** `AttractionListPage.vue` 已更新，现在每个景点卡片都会显示一张封面图片。
+    *   **前端 (详情页):** `AttractionDetailPage.vue` 已更新，添加了顶部的“英雄图”(Hero Image)。
+    *   **前端 (富文本):**
+        *   为前端项目安装了 `marked` 库，用于解析Markdown文本。
+        *   将景点的 `description` 字段升级为Markdown格式，允许在文本中嵌入图片。
+        *   `AttractionDetailPage.vue` 现在使用 `v-html` 指令渲染由 `marked` 解析后的HTML，实现了图文混排的介绍详情。
 
-   4. `RouteListPage` (路线列表页)
-       * 用途: 展示所有预设的推荐路线。
-       * 路径: /routes
+*   **[修复] 后端 500 错误:**
+    *   **问题:** 在实现图文混排后，访问API时出现 "500 Internal Server Error"，错误信息为 "invalid group reference"。
+    *   **原因:** 在 `main.py` 中，用于处理Markdown图片路径的正则表达式 `re.sub` 调用存在语法缺陷，导致服务器在处理数据时崩溃。
+    *   **解决:** 重写了 `re.sub` 的替换逻辑，使用更安全的回调函数模式代替了有问题的f-string格式化，彻底解决了该bug。
 
-   5. `RouteDetailPage` (路线详情页)
-       * 用途: 展示单条路线的详细信息，包含的景点、地图轨迹等。
-       * 路径: /routes/:id (例如 /routes/1)
-
-   6. `PersonalizationPage` (个性化定制页)
-       * 用途: 供用户通过交互式操作，创建自己的专属游览路线。
-       * 路径: /customize
-
-  页面关系与导航流程
-
-  我们可以用下面的结构图来表示页面之间的跳转关系：
-
-    1 / (首页)
-    2  │
-    3  ├──> /attractions (景点列表页)
-    4  │      │
-    5  │      └──> /attractions/:id (景点详情页)
-    6  │
-    7  ├──> /routes (路线列表页)
-    8  │      │
-    9  │      └──> /routes/:id (路线详情页)
-   10  │            │
-   11  │            └──> (可点击进入路线中包含的) /attractions/:id
-      (景点详情页)
-   12  │
-   13  ├──> /customize (个性化定制页)
-   14  │
-   15  └──> (首页上的推荐内容也可以直接跳转到) /attractions/:id 或
-      /routes/:id
+*   **[重构] 后端模块化:**
+    *   **动机:** `main.py` 文件变得过于庞大和复杂，不利于维护。
+    *   **方案:** 采用Flask蓝图 (Blueprints) 和应用工厂 (Application Factory) 模式进行重构。
+    *   **执行:**
+        *   创建了 `backend/app` 包，其中包含 `data_loader.py` (数据逻辑), `attractions_bp.py` (景点API), 和 `routes_bp.py` (路线API)。
+        *   在 `app/__init__.py` 中创建了 `create_app` 工厂函数，用于组装应用。
+        *   使用新的 `run.py` 作为启动脚本，替代了旧的 `main.py`。
+    *   **结果:** 后端代码现在结构清晰，职责分离，更易于维护和扩展。

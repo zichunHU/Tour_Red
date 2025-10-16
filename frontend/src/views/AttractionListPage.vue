@@ -1,3 +1,4 @@
+
 <script setup>
 import { ref, onMounted } from 'vue'
 
@@ -15,8 +16,8 @@ const selectedTheme = ref('')
 const areaOptions = ['黄浦区', '徐汇区']
 const themeOptions = ['革命足迹', '建党伟业', '革命烈士', '抗日战争', '伟人故居', '文化名人']
 
-// Backend URL
-const backendUrl = 'http://127.0.0.1:5000';
+// Backend API URL
+const apiUrl = 'http://127.0.0.1:5000/api';
 
 // Reusable function to fetch attractions based on current filters
 const fetchAttractions = async () => {
@@ -29,7 +30,7 @@ const fetchAttractions = async () => {
     if (selectedArea.value) params.append('area', selectedArea.value)
     if (selectedTheme.value) params.append('theme', selectedTheme.value)
     
-    const response = await fetch(`${backendUrl}/api/attractions?${params.toString()}`)
+    const response = await fetch(`${apiUrl}/attractions?${params.toString()}`)
     if (!response.ok) {
       throw new Error('Network response was not ok')
     }
@@ -95,7 +96,7 @@ const handleReset = () => {
       <p v-if="attractions.length === 0" class="no-results">没有找到符合条件的景点。</p>
       <router-link v-else v-for="attraction in attractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="card-link">
         <div class="card">
-          <img v-if="attraction.image_url" :src="backendUrl + attraction.image_url" :alt="attraction.name" class="card-image">
+          <img v-if="attraction.image_url" :src="attraction.image_url" :alt="attraction.name" class="card-image">
           <div class="card-content">
             <h3>{{ attraction.name }}</h3>
             <p class="description">{{ attraction.description }}</p>
@@ -243,6 +244,12 @@ const handleReset = () => {
   color: var(--secondary-text-color);
   line-height: 1.6;
   font-size: 0.9rem;
+  /* Truncate the text for card view */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  -webkit-box-orient: vertical;
 }
 
 .card .area-tag {

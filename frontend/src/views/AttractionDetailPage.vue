@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { marked } from 'marked'
 
 const route = useRoute()
 const router = useRouter()
@@ -9,12 +10,33 @@ const attraction = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
-const backendUrl = 'http://127.0.0.1:5000';
+const apiUrl = 'http://127.0.0.1:5000/api';
+
+// Configure marked
+marked.setOptions({
+  gfm: true, // Enable GitHub Flavored Markdown
+  breaks: true, // Convert single line breaks to <br>
+  sanitize: false // We trust our own content.
+});
+
+const renderedDescription = computed(() => {
+  if (attraction.value && attraction.value.description) {
+    return marked.parse(attraction.value.description);
+  }
+  return ''
+})
+
+const renderedDescriptionEn = computed(() => {
+  if (attraction.value && attraction.value.description_en) {
+    return marked.parse(attraction.value.description_en);
+  }
+  return ''
+})
 
 onMounted(async () => {
   const attractionId = route.params.id
   try {
-    const response = await fetch(`${backendUrl}/api/attractions/${attractionId}`)
+    const response = await fetch(`${apiUrl}/attractions/${attractionId}`)
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error('Attraction not found')
@@ -41,7 +63,7 @@ const goBack = () => {
     <div v-if="error" class="error-message">加载失败: {{ error }}</div>
 
     <article v-if="attraction" class="detail-card">
-      <img v-if="attraction.image_url" :src="backendUrl + attraction.image_url" :alt="attraction.name" class="detail-hero-image">
+      <img v-if="attraction.image_url" :src="attraction.image_url" :alt="attraction.name" class="detail-hero-image">
       
       <header class="detail-header">
         <button @click="goBack" class="back-button">&larr; 返回列表</button>
@@ -57,9 +79,10 @@ const goBack = () => {
         
         <div class="description">
           <h3>中文介绍</h3>
-          <p>{{ attraction.description }}</p>
+          <div v-html="renderedDescription" class="markdown-content"></div>
+
           <h3>English Introduction</h3>
-          <p>{{ attraction.description_en }}</p>
+          <div v-html="renderedDescriptionEn" class="markdown-content"></div>
         </div>
       </section>
     </article>
@@ -165,9 +188,18 @@ const goBack = () => {
   margin-bottom: 1rem;
 }
 
-.description p {
+.markdown-content ::v-deep(p) {
   line-height: 1.7;
   color: var(--secondary-text-color);
+  margin: 1em 0;
+}
+
+.markdown-content ::v-deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px; /* A slightly smaller radius than the card */
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .error-message {

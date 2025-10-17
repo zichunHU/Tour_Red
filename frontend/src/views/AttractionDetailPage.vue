@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { marked } from 'marked'
+// import { marked } from 'marked' // 不再需要marked库
 
 const route = useRoute()
 const router = useRouter()
@@ -12,26 +12,26 @@ const error = ref(null)
 
 const apiUrl = '/api';
 
-// Configure marked
-marked.setOptions({
-  gfm: true, // Enable GitHub Flavored Markdown
-  breaks: true, // Convert single line breaks to <br>
-  sanitize: false // We trust our own content.
-});
+// 不再需要配置marked和计算属性renderedDescription/renderedDescriptionEn
+// marked.setOptions({
+//   gfm: true, // Enable GitHub Flavored Markdown
+//   breaks: true, // Convert single line breaks to <br>
+//   sanitize: false // We trust our own content.
+// });
 
-const renderedDescription = computed(() => {
-  if (attraction.value && attraction.value.description) {
-    return marked.parse(attraction.value.description);
-  }
-  return ''
-})
+// const renderedDescription = computed(() => {
+//   if (attraction.value && attraction.value.description) {
+//     return marked.parse(attraction.value.description);
+//   }
+//   return ''
+// })
 
-const renderedDescriptionEn = computed(() => {
-  if (attraction.value && attraction.value.description_en) {
-    return marked.parse(attraction.value.description_en);
-  }
-  return ''
-})
+// const renderedDescriptionEn = computed(() => {
+//   if (attraction.value && attraction.value.description_en) {
+//     return marked.parse(attraction.value.description_en);
+//   }
+//   return ''
+// })
 
 onMounted(async () => {
   const attractionId = route.params.id
@@ -79,10 +79,10 @@ const goBack = () => {
         
         <div class="description">
           <h3>中文介绍</h3>
-          <div v-html="renderedDescription" class="markdown-content"></div>
+          <div v-html="attraction.description" class="markdown-content"></div>
 
           <h3>English Introduction</h3>
-          <div v-html="renderedDescriptionEn" class="markdown-content"></div>
+          <div v-html="attraction.description_en" class="markdown-content"></div>
         </div>
       </section>
     </article>

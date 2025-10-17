@@ -2,10 +2,25 @@ import os
 import json
 import re
 import shutil
+import time
 from flask import Blueprint, jsonify, request
+from werkzeug.utils import secure_filename
+import bleach
+
 from .data_loader import load_raw_attractions, enrich_attraction_urls, ATTRACTIONS_DATA_DIR
 
 attractions_bp = Blueprint('attractions_bp', __name__)
+
+# --- Bleach HTML Sanitization Settings ---
+ALLOWED_TAGS = {
+    'p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ol', 'ul', 'li', 'a', 'img', 'blockquote'
+}
+ALLOWED_ATTRIBUTES = {
+    '*': ['class'],
+    'a': ['href', 'rel'],
+    'img': ['src', 'alt', 'title', 'width', 'height'],
+}
 
 def slugify(text):
     """Generate a filesystem-friendly slug from a string."""
@@ -52,6 +67,41 @@ def get_attraction_detail(attraction_id):
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred in attraction detail: {str(e)}"}), 500
 
+@attractions_bp.route('/<int:attraction_id>/images', methods=['POST'])
+def upload_attraction_image(attraction_id):
+    # Find the attraction to get its directory name
+    raw_attractions = load_raw_attractions()
+    attraction = next((attr for attr in raw_attractions if attr.get('id') == attraction_id), None)
+    if not attraction:
+        return jsonify({"error": "Attraction not found"}), 404
+
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    if file:
+        # Create a secure, unique filename
+        filename = secure_filename(file.filename)
+        name, ext = os.path.splitext(filename)
+        unique_filename = f"{name}_{int(time.time())}{ext}"
+
+        # Save the file
+        attraction_dir = os.path.join(ATTRACTIONS_DATA_DIR, attraction['dir_name'])
+        save_path = os.path.join(attraction_dir, unique_filename)
+        file.save(save_path)
+
+        # Construct the public URL
+        backend_url = request.host_url.rstrip('/')
+        image_url = f"{backend_url}/static/attractions/{attraction['dir_name']}/{unique_filename}"
+
+        return jsonify({"imageUrl": image_url}), 201
+
+    return jsonify({"error": "File upload failed"}), 500
+
+
 @attractions_bp.route('/', methods=['POST'])
 def create_attraction():
     data = request.get_json()
@@ -88,6 +138,13 @@ def update_attraction(attraction_id):
     data = request.get_json()
     if not data:
         return jsonify({"error": "Request body cannot be empty"}), 400
+
+    # --- Sanitize HTML content before processing ---
+    if 'description' in data:
+        data['description'] = bleach.clean(data['description'], tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+    if 'description_en' in data:
+        data['description_en'] = bleach.clean(data['description_en'], tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+
 
     raw_attractions = load_raw_attractions()
     attraction_to_update = None

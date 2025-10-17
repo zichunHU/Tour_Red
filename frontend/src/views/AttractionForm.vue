@@ -2,6 +2,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import RichTextEditor from '../components/RichTextEditor.vue' // 导入富文本编辑器组件
 
 const route = useRoute()
 const router = useRouter()
@@ -13,7 +14,7 @@ const attraction = ref({
   theme: [],
   description: '',
   description_en: '',
-  image_url: 'image.jpg' // Default placeholder name
+  // image_url: 'image.jpg' // 默认图片名不再需要，图片通过富文本编辑器上传
 })
 
 const loading = ref(false)
@@ -29,10 +30,10 @@ onMounted(async () => {
       const response = await fetch(`${apiUrl}/attractions/${route.params.id}`)
       if (!response.ok) throw new Error('Failed to fetch attraction data')
       const data = await response.json()
-      // The backend sends full URLs, but we only want to edit the filename
-      if (data.image_url) {
-        data.image_url = data.image_url.split('/').pop()
-      }
+      // 移除image_url的特殊处理，因为现在图片由富文本编辑器管理
+      // if (data.image_url) {
+      //   data.image_url = data.image_url.split('/').pop()
+      // }
       attraction.value = data
     } catch (e) {
       error.value = e.message
@@ -102,17 +103,18 @@ const handleSubmit = async () => {
         <input id="theme" :value="attraction.theme.join(', ')" @input="attraction.theme = $event.target.value.split(',').map(t => t.trim())" type="text">
       </div>
       <div class="form-group">
-        <label for="description">介绍 (中文, 支持Markdown)</label>
-        <textarea id="description" v-model="attraction.description" rows="10"></textarea>
+        <label>介绍 (中文)</label>
+        <RichTextEditor v-model="attraction.description" :attraction-id="route.params.id || 0" />
       </div>
       <div class="form-group">
-        <label for="description_en">介绍 (English, Supports Markdown)</label>
-        <textarea id="description_en" v-model="attraction.description_en" rows="10"></textarea>
+        <label>介绍 (English)</label>
+        <RichTextEditor v-model="attraction.description_en" :attraction-id="route.params.id || 0" />
       </div>
-      <div class="form-group">
+      <!-- 主图片文件名输入框不再需要，因为图片通过富文本编辑器上传 -->
+      <!-- <div class="form-group">
         <label for="image_url">主图片文件名 (例如: image.jpg)</label>
         <input id="image_url" v-model="attraction.image_url" type="text">
-      </div>
+      </div> -->
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" :disabled="loading">{{ loading ? '保存中...' : '保存' }}</button>

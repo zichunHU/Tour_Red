@@ -11,10 +11,14 @@
   "dependencies": {
     "marked": "^16.4.0",
     "vue": "^3.3.4",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "@tiptap/vue-3": "^2.2.4",
+    "@tiptap/starter-kit": "^2.2.4",
+    "@tiptap/extension-image": "^2.2.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
+    "sass": "^1.93.2",
     "vite": "^4.4.5"
   }
 }

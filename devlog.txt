@@ -117,3 +117,31 @@
         1.  **配置代理:** 修改了 `frontend/vite.config.js`，添加了开发服务器代理，将所有 `/api` 前缀的请求转发到后端服务。
         2.  **移除硬编码:** 全面检查并修改了所有发起API请求的Vue组件，将写死的绝对URL替换为相对路径 (`/api`)，从而使请求通过Vite代理，规避了跨域问题。
     *   **结果:** 彻底解决了应用范围内的跨域请求问题，前后端数据交互恢复正常。
+
+*   **[改进] 管理系统富文本编辑器集成:**
+    *   **目标:** 将景点管理中的文本编辑框升级为现代富文本编辑器，支持图片上传。
+    *   **后端:**
+        1.  `backend/requirements.txt` 添加 `bleach` 库用于HTML净化。
+        2.  `backend/app/attractions_bp.py` 新增 `POST /api/attractions/<id>/images` 接口，处理图片上传，保存到景点目录并返回URL。
+        3.  `backend/app/attractions_bp.py` 修改 `PUT /api/attractions/<id>` 接口，在保存前对 `description` 和 `description_en` 字段进行HTML净化。
+    *   **前端:**
+        1.  `frontend/package.json` 添加 `@tiptap/vue-3`, `@tiptap/starter-kit`, `@tiptap/extension-image` 依赖。
+        2.  创建 `frontend/src/components/RichTextEditor.vue` 组件，封装 Tiptap 编辑器，包含工具栏和图片上传逻辑。
+        3.  `frontend/src/views/AttractionForm.vue` 替换 `<textarea>` 为 `RichTextEditor` 组件，并调整数据绑定。
+        4.  `frontend/src/views/AttractionDetailPage.vue` 移除 `marked` 库，直接使用 `v-html` 渲染HTML内容。
+    *   **[修复] 富文本编辑器图片上传问题:**
+        1.  **问题:** 点击“Add Image”按钮时，意外触发父表单提交，导致图片上传失败。
+        2.  **原因:** `RichTextEditor.vue` 中的按钮默认 `type="submit"`。
+        3.  **解决:** 将 `RichTextEditor.vue` 中所有工具栏按钮的 `type` 属性明确设置为 `"button"`。
+        4.  **问题:** 新建景点时，`attractionId` 为 `0`，导致图片上传接口调用失败。
+        5.  **解决:** 在 `RichTextEditor.vue` 中，当 `attractionId` 为 `0` 时，禁用“Add Image”按钮，提示用户先保存景点。
+    *   **结果:** 管理系统现在拥有一个功能完善的富文本编辑器，支持图片上传，并解决了相关交互问题。
+
+*   **[改进] 管理系统景点主图片编辑功能:**
+    *   **目标:** 允许用户在景点编辑页面直接上传和修改景点的主图片。
+    *   **前端:**
+        1.  创建 `frontend/src/components/SingleImageUpload.vue` 组件，用于处理单个图片的上传和预览。
+        2.  修改 `frontend/src/views/AttractionForm.vue`，引入 `SingleImageUpload` 组件，并用它替换原有的 `image_url` 输入框。
+        3.  调整 `AttractionForm.vue` 中 `attraction` 对象的初始化，确保 `image_url` 字段能正确绑定和更新。
+    *   **后端:** 复用已有的 `POST /api/attractions/<id>/images` 接口进行图片上传。
+    *   **结果:** 管理员现在可以方便地为每个景点上传和更新主图片。

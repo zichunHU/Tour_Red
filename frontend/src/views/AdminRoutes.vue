@@ -8,7 +8,7 @@ const loading = ref(true)
 const error = ref(null)
 const router = useRouter()
 
-const apiUrl = 'http://127.0.0.1:5000/api';
+const apiUrl = '/api';
 
 const fetchRoutes = async () => {
   loading.value = true

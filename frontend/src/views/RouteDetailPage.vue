@@ -13,7 +13,7 @@ const error = ref(null)
 onMounted(async () => {
   const routeId = route.params.id
   try {
-    const response = await fetch(`http://127.0.0.1:5000/api/routes/${routeId}`)
+    const response = await fetch(`/api/routes/${routeId}`)
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error('Route not found')

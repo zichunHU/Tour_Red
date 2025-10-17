@@ -19,7 +19,7 @@ const attraction = ref({
 const loading = ref(false)
 const error = ref(null)
 
-const apiUrl = 'http://127.0.0.1:5000/api';
+const apiUrl = '/api';
 const isEditMode = computed(() => !!route.params.id)
 
 onMounted(async () => {

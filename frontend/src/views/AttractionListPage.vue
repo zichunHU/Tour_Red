@@ -17,7 +17,7 @@ const areaOptions = ['黄浦区', '徐汇区']
 const themeOptions = ['革命足迹', '建党伟业', '革命烈士', '抗日战争', '伟人故居', '文化名人']
 
 // Backend API URL
-const apiUrl = 'http://127.0.0.1:5000/api';
+const apiUrl = '/api';
 
 // Reusable function to fetch attractions based on current filters
 const fetchAttractions = async () => {

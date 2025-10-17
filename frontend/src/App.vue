@@ -9,6 +9,7 @@
 
         <span class="nav-separator">|</span>
         <router-link to="/admin">后台管理</router-link>
+        <button v-if="isLoggedIn" @click="handleLogout" class="logout-button">登出</button>
       </nav>
     </header>
     <main>
@@ -16,6 +17,34 @@
     </main>
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+const isLoggedIn = ref(false)
+
+const checkLoginStatus = () => {
+  isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true'
+}
+
+const handleLogout = () => {
+  localStorage.removeItem('isLoggedIn')
+  checkLoginStatus()
+  router.push('/login')
+}
+
+onMounted(() => {
+  checkLoginStatus()
+})
+
+// Watch for route changes to update login status (e.g., after login/logout)
+watch(route, () => {
+  checkLoginStatus()
+})
+</script>
 
 <style>
 /* Apple-inspired Design System */
@@ -46,6 +75,12 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
+#app-layout nav {
+  display: flex;
+  align-items: center; /* Align items vertically */
+  justify-content: center;
+}
+
 #app-layout nav a {
   color: var(--secondary-text-color);
   font-weight: 600;
@@ -74,5 +109,20 @@ body {
 .nav-separator {
   color: var(--border-color);
   margin: 0 0.5rem;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: var(--secondary-text-color);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 1rem;
+  transition: color 0.3s ease;
+}
+
+.logout-button:hover {
+  color: var(--primary-text-color);
 }
 </style>

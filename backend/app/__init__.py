@@ -23,6 +23,9 @@ def create_app():
     from . import routes_bp
     app.register_blueprint(routes_bp.routes_bp, url_prefix='/api/routes')
 
+    from . import auth_bp
+    app.register_blueprint(auth_bp.auth_bp, url_prefix='/api')
+
     @app.route("/")
     def home():
         return "Hello from the modular Flask backend!"

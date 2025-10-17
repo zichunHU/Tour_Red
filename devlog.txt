@@ -145,3 +145,15 @@
         3.  调整 `AttractionForm.vue` 中 `attraction` 对象的初始化，确保 `image_url` 字段能正确绑定和更新。
     *   **后端:** 复用已有的 `POST /api/attractions/<id>/images` 接口进行图片上传。
     *   **结果:** 管理员现在可以方便地为每个景点上传和更新主图片。
+
+*   **[改进] 管理系统美化与密码保护:**
+    *   **目标:** 美化后台管理面板 (`/admin`) 并为其添加密码保护。
+    *   **前端:**
+        1.  **美化 `AdminDashboard.vue`:** 调整布局和样式，使其更具现代感和专业性。
+        2.  **登录页面:** 创建 `frontend/src/views/LoginPage.vue`，提供用户名和密码输入。
+        3.  **路由守卫:** 修改 `frontend/src/router/index.js`，添加 `/login` 路由，并实现全局导航守卫，保护所有 `/admin` 路径，未登录用户将重定向到登录页。
+        4.  **登出功能:** 修改 `frontend/src/App.vue`，添加一个在登录状态下显示的“登出”按钮，并实现清除登录状态的逻辑。
+    *   **后端:**
+        1.  **认证蓝图:** 创建 `backend/app/auth_bp.py`，实现 `POST /api/login` 接口，用于验证用户名和密码（硬编码为 `admin`/`password`）。
+        2.  **注册蓝图:** 在 `backend/app/__init__.py` 中注册 `auth_bp` 蓝图。
+    *   **结果:** 管理后台现在拥有更美观的界面，并通过用户名 `admin` 和密码 `password` 实现了基本的访问控制。

@@ -3,70 +3,79 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, toRefs } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps({
-  latitude: {
-    type: Number,
-    required: true
-  },
-  longitude: {
-    type: Number,
-    required: true
+  waypoints: {
+    type: Array,
+    default: () => []
   }
 })
 
-const { latitude, longitude } = toRefs(props)
 const mapContainer = ref(null)
 let map = null // To hold the map instance
 
 const initMap = () => {
-  if (!latitude.value || !longitude.value) {
-    console.warn('MapViewer: Latitude or Longitude is missing.');
-    return;
-  }
-
-  // Ensure AMap is loaded
   if (typeof AMap === 'undefined') {
-    console.error('AMap SDK is not loaded. Please check your index.html and API key.');
+    console.error('AMap SDK is not loaded.');
     return;
   }
-
-  const center = [longitude.value, latitude.value];
 
   map = new AMap.Map(mapContainer.value, {
-    zoom: 15,
-    center: center,
-    viewMode: '3D' // Use 3D view
+    zoom: 12, // Default zoom
+    viewMode: '3D'
   });
 
-  const marker = new AMap.Marker({
-    position: center,
-    offset: new AMap.Pixel(-13, -30)
-  });
-
-  map.add(marker);
+  updateMap(props.waypoints);
 }
 
-onMounted(() => {
-  // A small delay might be necessary to ensure the AMap script is fully loaded and executed
-  setTimeout(initMap, 100);
-});
+const updateMap = (newWaypoints) => {
+  if (!map || !newWaypoints || newWaypoints.length === 0) {
+    return;
+  }
 
-// Watch for prop changes to recenter the map
-watch([latitude, longitude], (newVals) => {
-  if (map && newVals[0] && newVals[1]) {
-    const newCenter = [newVals[1], newVals[0]];
-    map.setCenter(newCenter);
-    // Clear existing markers and add a new one
-    map.clearMap();
+  map.clearMap();
+
+  const points = newWaypoints.map(wp => new AMap.LngLat(wp.longitude, wp.latitude));
+
+  if (points.length === 1) {
+    // Single point logic
+    map.setCenter(points[0]);
+    map.setZoom(15);
     const marker = new AMap.Marker({
-      position: newCenter,
+      position: points[0],
       offset: new AMap.Pixel(-13, -30)
     });
     map.add(marker);
+  } else {
+    // Multi-point route planning logic, assuming AMap.Driving is pre-loaded
+    const driving = new AMap.Driving({
+      map: map,
+      policy: AMap.DrivingPolicy.LEAST_TIME
+    });
+
+    const start = points[0];
+    const end = points[points.length - 1];
+    const waypoints = points.slice(1, -1);
+
+    driving.search(start, end, { waypoints: waypoints }, (status, result) => {
+      if (status === 'complete') {
+        // Route drawn successfully by the plugin
+      } else {
+        console.error('Failed to get driving route:', result);
+      }
+    });
   }
+}
+
+onMounted(() => {
+  setTimeout(initMap, 100); // Delay to ensure AMap script is loaded
 });
+
+// Watch for prop changes to update the route
+watch(() => props.waypoints, (newWaypoints) => {
+  updateMap(newWaypoints);
+}, { deep: true });
 
 </script>
 

@@ -1,7 +1,8 @@
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import MapViewer from '../components/MapViewer.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -9,6 +10,21 @@ const router = useRouter()
 const routeData = ref(null)
 const loading = ref(true)
 const error = ref(null)
+
+const routeWaypoints = computed(() => {
+  if (!routeData.value || !routeData.value.attractions) {
+    return [];
+  }
+  return routeData.value.attractions.map(attraction => {
+    if (attraction.location) {
+      return {
+        longitude: attraction.location.longitude,
+        latitude: attraction.location.latitude
+      };
+    }
+    return null;
+  }).filter(Boolean); // Filter out any nulls if an attraction is missing location
+});
 
 onMounted(async () => {
   const routeId = route.params.id
@@ -47,32 +63,43 @@ const goBack = () => {
         <span class="tag theme-tag">{{ routeData.theme }}</span>
       </header>
 
-      <section class="detail-content">
-        <div class="description">
-          <h3>路线介绍</h3>
-          <p>{{ routeData.description }}</p>
+      <div class="main-content-grid">
+        <div class="left-column">
+          <section class="detail-content">
+            <div class="description">
+              <h3>路线介绍</h3>
+              <p>{{ routeData.description }}</p>
+            </div>
+
+            <div class="attractions-section">
+              <h3>包含景点</h3>
+              <div class="attractions-container">
+                <router-link v-for="attraction in routeData.attractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="attraction-card-link">
+                  <div class="attraction-card">
+                    <h4>{{ attraction.name }}</h4>
+                    <p>{{ attraction.description.substring(0, 80) }}...</p>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div class="attractions-section">
-          <h3>包含景点</h3>
-          <div class="attractions-container">
-            <router-link v-for="attraction in routeData.attractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="attraction-card-link">
-              <div class="attraction-card">
-                <h4>{{ attraction.name }}</h4>
-                <p>{{ attraction.description.substring(0, 80) }}...</p>
-              </div>
-            </router-link>
+        <div class="right-column">
+          <div class="map-section">
+            <MapViewer v-if="routeWaypoints.length > 0" :waypoints="routeWaypoints" />
           </div>
         </div>
-      </section>
+      </div>
     </article>
   </div>
 </template>
 
 <style scoped>
 .page-container {
-  max-width: 800px;
+  max-width: 1200px; /* Widen for two columns */
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .detail-card {
@@ -80,6 +107,8 @@ const goBack = () => {
   border-radius: var(--card-border-radius);
   box-shadow: var(--card-shadow);
   overflow: hidden;
+  margin-top: 2rem;
+  margin-bottom: 2rem; 
 }
 
 .detail-header {
@@ -87,6 +116,30 @@ const goBack = () => {
   text-align: center;
   border-bottom: 1px solid var(--border-color);
   position: relative;
+}
+
+.main-content-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr; /* Adjust ratio as needed */
+  gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .main-content-grid {
+    grid-template-columns: 1fr; /* Stack on smaller screens */
+  }
+}
+
+.map-section {
+  position: sticky;
+  top: 2rem; /* Stick to the top while scrolling */
+  padding: 1.5rem;
+}
+
+/* Adjust map viewer height within this specific page */
+.map-section :deep(.map-viewer) {
+  height: 500px;
+  max-height: 70vh;
 }
 
 .back-button {
@@ -124,7 +177,7 @@ const goBack = () => {
 }
 
 .detail-content {
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .tag {

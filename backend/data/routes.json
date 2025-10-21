@@ -25,13 +25,27 @@
     ]
   },
   {
-    "name": "初心与使命：建党伟业探寻之",
-    "description": "",
+    "name": "上海经典一日游",
+    "name_en": "Classic Shanghai One-Day Tour",
+    "description": "本路线带您领略上海最具代表性的两个景点：外滩的万国建筑博览群和豫园的古典园林之美。",
+    "description_en": "This route shows you two of the most representative attractions in Shanghai: the exotic building clusters on the Bund and the beauty of classical gardens in Yu Garden.",
+    "theme": "一日游",
     "attraction_ids": [
-      1,
-      3,
-      0
+      4,
+      5
     ],
     "id": 3
+  },
+  {
+    "name": "黄浦江畔红色漫步",
+    "name_en": "Red Walk Along the Huangpu River",
+    "description": "从党的诞生地出发，漫步至外滩，感受上海的红色历史与现代都市的交融。",
+    "description_en": "Starting from the birthplace of the Party and strolling to the Bund, experience the blend of Shanghai's red history and modern metropolis.",
+    "theme": "半日游",
+    "attraction_ids": [
+      1,
+      4
+    ],
+    "id": 4
   }
 ]

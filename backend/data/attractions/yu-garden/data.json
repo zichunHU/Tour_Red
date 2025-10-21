@@ -1,0 +1,19 @@
+{
+  "name": "豫园",
+  "name_en": "Yu Garden",
+  "area": "黄浦区",
+  "theme": [
+    "古典园林",
+    "历史"
+  ],
+  "address": "上海市黄浦区福佑路168号",
+  "description": "豫园是位于上海市黄浦区的一座明代江南古典私家园林，始建于明代嘉靖、万历年间。",
+  "description_en": "Yu Garden or Yuyuan Garden is an extensive Chinese garden located beside the City God Temple in the northeast of the Old City of Shanghai at Huangpu Qu, Shanghai.",
+  "image_url": "",
+  "location": {
+    "latitude": 31.227761,
+    "longitude": 121.492502
+  },
+  "id": 5,
+  "dir_name": "yu-garden"
+}

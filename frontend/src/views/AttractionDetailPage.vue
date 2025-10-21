@@ -55,6 +55,10 @@ const goBack = () => {
           <span class="tag area-tag">{{ attraction.area }}</span>
           <span v-for="theme in attraction.theme" :key="theme" class="tag theme-tag">{{ theme }}</span>
         </div>
+
+        <div v-if="attraction.address" class="address-section">
+          <p><strong>地址:</strong> {{ attraction.address }}</p>
+        </div>
         
         <div class="content-grid">
           <div class="description-container">
@@ -171,6 +175,22 @@ const goBack = () => {
 .theme-tag {
   background-color: #ffe5e5;
   color: var(--accent-color);
+}
+
+.address-section {
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.address-section p {
+  font-size: 1.1rem;
+  color: var(--secondary-text-color);
+  margin: 0;
+}
+
+.address-section strong {
+  color: var(--primary-text-color);
 }
 
 /* New Grid Layout */

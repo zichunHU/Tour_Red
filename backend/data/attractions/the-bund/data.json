@@ -1,0 +1,19 @@
+{
+  "name": "外滩",
+  "name_en": "The Bund",
+  "area": "黄浦区",
+  "theme": [
+    "地标",
+    "观光"
+  ],
+  "address": "上海市黄浦区中山东一路",
+  "description": "外滩是上海市中心的一个区域，由一段沿黄浦江的河岸组成，为上海重要的地标之一。",
+  "description_en": "The Bund is a waterfront area in central Shanghai. The area centers on a section of Zhongshan Road within the former Shanghai International Settlement, which runs along the western bank of the Huangpu River in the eastern part of Huangpu District.",
+  "image_url": "",
+  "location": {
+    "latitude": 31.238949,
+    "longitude": 121.489968
+  },
+  "id": 4,
+  "dir_name": "the-bund"
+}

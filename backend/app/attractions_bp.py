@@ -3,6 +3,7 @@ import json
 import re
 import shutil
 import time
+import requests
 from flask import Blueprint, jsonify, request
 from werkzeug.utils import secure_filename
 import bleach
@@ -10,6 +11,12 @@ import bleach
 from .data_loader import load_raw_attractions, enrich_attraction_urls, ATTRACTIONS_DATA_DIR
 
 attractions_bp = Blueprint('attractions_bp', __name__)
+
+# --- Geocoding Configuration ---
+# 警告: 请将下面的 'YOUR_AMAP_KEY' 替换为您自己的高德地图API Key。
+# 为了安全，请勿将包含真实密钥的文件提交到版本控制系统。
+AMAP_API_KEY = "aeaae00007b40fff8508b130084a22e6"
+AMAP_GEOCODE_URL = "https://restapi.amap.com/v3/geocode/geo"
 
 # --- Bleach HTML Sanitization Settings ---
 ALLOWED_TAGS = {
@@ -21,6 +28,31 @@ ALLOWED_ATTRIBUTES = {
     'a': ['href', 'rel'],
     'img': ['src', 'alt', 'title', 'width', 'height'],
 }
+
+def geocode_address(address):
+    """Convert an address to latitude and longitude using AMap API."""
+    if not AMAP_API_KEY or AMAP_API_KEY == "YOUR_AMAP_KEY":
+        print("Warning: AMAP_API_KEY is not set in attractions_bp.py. Geocoding will be skipped.")
+        return None
+
+    params = {
+        'key': AMAP_API_KEY,
+        'address': address
+    }
+    try:
+        response = requests.get(AMAP_GEOCODE_URL, params=params)
+        response.raise_for_status() # Raise an exception for bad status codes
+        data = response.json()
+        if data['status'] == '1' and data['geocodes']:
+            location_str = data['geocodes'][0]['location']
+            longitude, latitude = map(float, location_str.split(','))
+            return {"latitude": latitude, "longitude": longitude}
+        else:
+            print(f"Geocoding failed for address '{address}'. Reason: {data.get('info')}")
+            return None
+    except requests.exceptions.RequestException as e:
+        print(f"Error calling AMap API: {e}")
+        return None
 
 def slugify(text):
     """Generate a filesystem-friendly slug from a string."""
@@ -108,6 +140,12 @@ def create_attraction():
     if not data or not data.get('name'):
         return jsonify({"error": "Missing required field: name"}), 400
 
+    # --- Geocode address if present ---
+    if data.get('address'):
+        location = geocode_address(data['address'])
+        if location:
+            data['location'] = location
+
     raw_attractions = load_raw_attractions()
     new_id = max([attr.get('id', 0) for attr in raw_attractions] + [0]) + 1
     data['id'] = new_id
@@ -118,7 +156,9 @@ def create_attraction():
     if slug in existing_slugs:
         slug = f"{slug}-{new_id}"
     
+    data['dir_name'] = slug
     attraction_dir = os.path.join(ATTRACTIONS_DATA_DIR, slug)
+
     try:
         os.makedirs(attraction_dir)
         with open(os.path.join(attraction_dir, 'data.json'), 'w', encoding='utf-8') as f:
@@ -145,16 +185,18 @@ def update_attraction(attraction_id):
     if 'description_en' in data:
         data['description_en'] = bleach.clean(data['description_en'], tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
 
-
     raw_attractions = load_raw_attractions()
-    attraction_to_update = None
-    for attr in raw_attractions:
-        if attr.get('id') == attraction_id:
-            attraction_to_update = attr
-            break
+    attraction_to_update = next((attr for attr in raw_attractions if attr.get('id') == attraction_id), None)
     
     if not attraction_to_update:
         return jsonify({"error": "Attraction not found"}), 404
+
+    # --- Geocode if address is new or has changed ---
+    new_address = data.get('address')
+    if new_address and new_address != attraction_to_update.get('address'):
+        location = geocode_address(new_address)
+        if location:
+            data['location'] = location
 
     attraction_dir = os.path.join(ATTRACTIONS_DATA_DIR, attraction_to_update['dir_name'])
     data_file_path = os.path.join(attraction_dir, 'data.json')
@@ -173,11 +215,7 @@ def update_attraction(attraction_id):
 @attractions_bp.route('/<int:attraction_id>', methods=['DELETE'])
 def delete_attraction(attraction_id):
     raw_attractions = load_raw_attractions()
-    attraction_to_delete = None
-    for attr in raw_attractions:
-        if attr.get('id') == attraction_id:
-            attraction_to_delete = attr
-            break
+    attraction_to_delete = next((attr for attr in raw_attractions if attr.get('id') == attraction_id), None)
 
     if not attraction_to_delete:
         return jsonify({"error": "Attraction not found"}), 404

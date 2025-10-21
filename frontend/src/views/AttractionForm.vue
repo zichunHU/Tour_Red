@@ -15,7 +15,11 @@ const attraction = ref({
   theme: [],
   description: '',
   description_en: '',
-  image_url: '' // 初始化为空字符串，而不是默认图片名
+  image_url: '', // 初始化为空字符串，而不是默认图片名
+  location: {
+    latitude: null,
+    longitude: null
+  }
 })
 
 const loading = ref(false)
@@ -99,6 +103,14 @@ const handleSubmit = async () => {
       <div class="form-group">
         <label for="theme">主题 (逗号分隔)</label>
         <input id="theme" :value="attraction.theme.join(', ')" @input="attraction.theme = $event.target.value.split(',').map(t => t.trim())" type="text">
+      </div>
+      <div class="form-group">
+        <label for="latitude">纬度 (Latitude)</label>
+        <input id="latitude" v-model.number="attraction.location.latitude" type="number" step="any">
+      </div>
+      <div class="form-group">
+        <label for="longitude">经度 (Longitude)</label>
+        <input id="longitude" v-model.number="attraction.location.longitude" type="number" step="any">
       </div>
       <div class="form-group">
         <label>介绍 (中文)</label>

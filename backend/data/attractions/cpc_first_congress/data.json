@@ -11,5 +11,9 @@
   "description": "<p>中国共产党的诞生地，一幢典型的石库门建筑，见证了中国历史上开天辟地的大事变。 ![中共一大会址外景](http://127.0.0.1:5000/static/attractions/cpc_first_congress/detail_1.jpg) 纪念馆内部陈列着丰富的历史文物和文献资料，生动再现了中国共产党创建时期的艰辛历程和伟大精神。参观者可以通过多媒体展示、场景复原等方式，身临其境地感受那段波澜壮阔的革命岁月。 ![纪念馆内部展陈](http://127.0.0.1:5000/static/attractions/cpc_first_congress/detail_2.jpg)<img src=\"http://127.0.0.1:5000/static/attractions/cpc_first_congress/IMG20250827094905_1760716262.jpg\"></p><p><img src=\"http://127.0.0.1:5000/static/attractions/cpc_first_congress/IMG20250827102211_1760716268.jpg\"></p>",
   "description_en": "The birthplace of the Communist Party of China, a typical Shikumen building that witnessed a world-changing event in Chinese history.\n\n![Exterior of the Memorial](http://127.0.0.1:5000/static/attractions/cpc_first_congress/detail_1.jpg)\n\nInside the memorial hall, a wealth of historical relics and documents are displayed, vividly reproducing the arduous course and great spirit of the founding period of the Communist Party of China. Visitors can experience the magnificent revolutionary years immersively through multimedia displays and scene restorations.\n\n![Exhibits inside the memorial](http://127.0.0.1:5000/static/attractions/cpc_first_congress/detail_2.jpg)",
   "image_url": "http://127.0.0.1:5000/static/attractions/cpc_first_congress/image.jpg",
-  "dir_name": "cpc_first_congress"
+  "dir_name": "cpc_first_congress",
+  "location": {
+    "latitude": 31.22206,
+    "longitude": 121.47069
+  }
 }

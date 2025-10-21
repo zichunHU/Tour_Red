@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// import { marked } from 'marked' // 不再需要marked库
+import MapViewer from '../components/MapViewer.vue' // 导入地图组件
 
 const route = useRoute()
 const router = useRouter()
@@ -11,27 +11,6 @@ const loading = ref(true)
 const error = ref(null)
 
 const apiUrl = '/api';
-
-// 不再需要配置marked和计算属性renderedDescription/renderedDescriptionEn
-// marked.setOptions({
-//   gfm: true, // Enable GitHub Flavored Markdown
-//   breaks: true, // Convert single line breaks to <br>
-//   sanitize: false // We trust our own content.
-// });
-
-// const renderedDescription = computed(() => {
-//   if (attraction.value && attraction.value.description) {
-//     return marked.parse(attraction.value.description);
-//   }
-//   return ''
-// })
-
-// const renderedDescriptionEn = computed(() => {
-//   if (attraction.value && attraction.value.description_en) {
-//     return marked.parse(attraction.value.description_en);
-//   }
-//   return ''
-// })
 
 onMounted(async () => {
   const attractionId = route.params.id
@@ -77,12 +56,28 @@ const goBack = () => {
           <span v-for="theme in attraction.theme" :key="theme" class="tag theme-tag">{{ theme }}</span>
         </div>
         
-        <div class="description">
-          <h3>中文介绍</h3>
-          <div v-html="attraction.description" class="markdown-content"></div>
+        <div class="content-grid">
+          <div class="description-container">
+            <div class="description">
+              <h3>中文介绍</h3>
+              <div v-html="attraction.description" class="markdown-content"></div>
 
-          <h3>English Introduction</h3>
-          <div v-html="attraction.description_en" class="markdown-content"></div>
+              <h3>English Introduction</h3>
+              <div v-html="attraction.description_en" class="markdown-content"></div>
+            </div>
+          </div>
+
+          <aside class="map-container">
+            <h3>位置信息</h3>
+            <MapViewer 
+              v-if="attraction.location && attraction.location.latitude && attraction.location.longitude"
+              :latitude="attraction.location.latitude" 
+              :longitude="attraction.location.longitude"
+            />
+            <div v-else class="no-location">
+              暂无地理位置信息
+            </div>
+          </aside>
         </div>
       </section>
     </article>
@@ -91,7 +86,7 @@ const goBack = () => {
 
 <style scoped>
 .page-container {
-  max-width: 800px;
+  max-width: 1200px; /* Widen the container for two columns */
   margin: 0 auto;
 }
 
@@ -106,7 +101,7 @@ const goBack = () => {
 
 .detail-hero-image {
   width: 100%;
-  height: 350px;
+  height: 400px; /* Increased height for a more impressive hero image */
   object-fit: cover;
 }
 
@@ -178,14 +173,38 @@ const goBack = () => {
   color: var(--accent-color);
 }
 
-.description h3 {
+/* New Grid Layout */
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2/3 for description, 1/3 for map */
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .content-grid {
+    grid-template-columns: 1fr; /* Stack on smaller screens */
+  }
+}
+
+.description h3, .map-container h3 {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--primary-text-color);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.map-container .no-location {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background-color: var(--background-color);
+  color: var(--secondary-text-color);
+  border-radius: var(--card-border-radius);
 }
 
 .markdown-content ::v-deep(p) {

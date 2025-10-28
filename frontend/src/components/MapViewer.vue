@@ -128,7 +128,7 @@ watch([points, () => props.selectedIds], () => {
 <style scoped>
 .map-viewer {
   width: 100%;
-  height: 400px; /* Default height, can be overridden by parent */
+  height: 100%; /* Changed from 400px to fill container */
   border-radius: var(--card-border-radius);
 }
 </style>

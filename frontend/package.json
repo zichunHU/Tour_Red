@@ -14,7 +14,8 @@
     "vue-router": "^4.6.3",
     "@tiptap/vue-3": "^2.2.4",
     "@tiptap/starter-kit": "^2.2.4",
-    "@tiptap/extension-image": "^2.2.4"
+    "@tiptap/extension-image": "^2.2.4",
+    "swiper": "^11.1.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",

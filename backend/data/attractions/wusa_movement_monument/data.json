@@ -1,0 +1,19 @@
+{
+  "id": 6,
+  "name": "五卅运动纪念碑",
+  "name_en": "May 30th Movement Monument",
+  "area": "黄浦区",
+  "theme": [
+    "工人运动",
+    "革命足迹"
+  ],
+  "address": "上海市黄浦区南京东路步行街（近九江路）",
+  "description": "<p>五卅运动是中国工人运动的重要里程碑，展现了革命精神的传承和发扬，是初心与使命的外在体现。</p>",
+  "description_en": "<p>The May 30th Movement Monument marks a significant milestone in the Chinese workers' movement, showcasing the inheritance and promotion of the revolutionary spirit.</p>",
+  "image_url": "http://127.0.0.1:5000/static/attractions/wusa_movement_monument/1000005378_1761650221.jpeg",
+  "location": {
+    "latitude": null,
+    "longitude": null
+  },
+  "dir_name": "wusa_movement_monument"
+}

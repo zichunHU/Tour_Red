@@ -1,0 +1,19 @@
+{
+  "id": 9,
+  "name": "又新印刷所旧址",
+  "name_en": "The Former Site of Youxin Printing Press",
+  "area": "黄浦区",
+  "theme": [
+    "建党伟业",
+    "革命足迹"
+  ],
+  "address": "上海市黄浦区复兴中路221弄",
+  "description": "<p>这里是第一个中文全译本《共产党宣言》的印刷地，见证了马克思主义思想的“理论到出版”的关键一步。</p>",
+  "description_en": "<p>This is the site where the first full Chinese translation of \"The Communist Manifesto\" was printed, marking a key step from theory to publication for Marxist ideas.</p>",
+  "image_url": "http://127.0.0.1:5000/static/attractions/youxin_printing_press_site/IMG20250827115250_1761649805.jpg",
+  "location": {
+    "latitude": null,
+    "longitude": null
+  },
+  "dir_name": "youxin_printing_press_site"
+}

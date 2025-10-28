@@ -1,0 +1,19 @@
+{
+  "id": 7,
+  "name": "上海总工会旧址",
+  "name_en": "The Former Site of Shanghai General Union",
+  "area": "黄浦区",
+  "theme": [
+    "工人运动",
+    "革命足迹"
+  ],
+  "address": "上海市黄浦区九江路346号",
+  "description": "<p>上海总工会在五卅运动中发挥了重要作用，是工人运动的重要指挥中心，体现了初心与使命的实践。</p>",
+  "description_en": "<p>The Shanghai General Union played a crucial role in the May 30th Movement as the main command center for the workers' movement, embodying the practice of the original mission.</p>",
+  "image_url": "http://127.0.0.1:5000/static/attractions/shanghai_general_union_site/IMG20250827125034_1761649839.jpg",
+  "location": {
+    "latitude": null,
+    "longitude": null
+  },
+  "dir_name": "shanghai_general_union_site"
+}

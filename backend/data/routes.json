@@ -47,5 +47,31 @@
       4
     ],
     "id": 4
+  },
+  {
+    "id": 5,
+    "name": "初心与使命：星火燎原·黄浦红色基因解码之旅",
+    "name_en": "Original Mission: Decoding the Red Gene of Huangpu",
+    "description": "本路线从党的诞生地出发，串联起中国工人运动的重要地标，解码上海作为革命发源地的红色基因。",
+    "description_en": "Starting from the birthplace of the Party, this route connects important landmarks of the Chinese workers' movement, decoding the red gene of Shanghai as a revolutionary cradle.",
+    "theme": "半日游",
+    "attraction_ids": [
+      1,
+      6,
+      7
+    ]
+  },
+  {
+    "id": 6,
+    "name": "真理之光·马克思主义传播轨迹",
+    "name_en": "The Light of Truth: The Trajectory of Marxism's Spread",
+    "description": "本路线聚焦于法租界内的几个关键地点，展示马克思主义如何在上海完成“理论→出版→组织”的完整传播链条。",
+    "description_en": "Focusing on several key locations within the former French Concession, this route showcases how Marxism completed the entire chain of \"Theory -> Publication -> Organization\" in Shanghai.",
+    "theme": "半日游",
+    "attraction_ids": [
+      8,
+      9,
+      10
+    ]
   }
 ]

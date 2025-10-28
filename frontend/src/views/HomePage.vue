@@ -2,6 +2,18 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
+// Import Swiper Vue.js components
+import { Swiper, SwiperSlide } from 'swiper/vue';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+import 'swiper/css/autoplay';
+
+// import required modules
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+
 const router = useRouter();
 
 // --- STATE & DATA FETCHING ---
@@ -9,6 +21,7 @@ const attractions = ref([]);
 const routes = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const heroCurrentSlideIndex = ref(0);
 
 const interestTags = ref([
   { name: '建党伟业', icon: '🏛️' },
@@ -18,6 +31,8 @@ const interestTags = ref([
   { name: '伟人故居', icon: '🏠' },
   { name: '文化名人', icon: '✒️' },
 ]);
+
+const swiperModules = [Autoplay, Pagination, Navigation];
 
 onMounted(async () => {
   try {
@@ -37,15 +52,37 @@ onMounted(async () => {
   }
 });
 
+// --- HELPERS ---
+const stripHtml = (html) => {
+  if (!html) return '';
+  let doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || "";
+}
+
+const truncate = (text, length) => {
+  if (!text) return '';
+  return text.length > length ? text.substring(0, length) + '…' : text;
+}
+
 // --- COMPUTED PROPERTIES ---
 
-// For this demo, we'll feature the first 4 attractions.
-const featuredAttractions = computed(() => attractions.value.slice(0, 4));
+const heroSlides = computed(() => attractions.value.filter(a => a.image_url).slice(0, 5));
+const featuredAttractions = computed(() => attractions.value.slice(0, 8));
+const featuredRoutes = computed(() => routes.value.slice(0, 4));
 
-// Feature the first 2 routes.
-const featuredRoutes = computed(() => routes.value.slice(0, 2));
+const dynamicSubtitle = computed(() => {
+  if (!heroSlides.value.length) return "在上海的红色地标中，发现历史的回响，感受时代的脉搏。";
+  const currentAttraction = heroSlides.value[heroCurrentSlideIndex.value];
+  if (!currentAttraction) return "";
+  const cleanDescription = stripHtml(currentAttraction.description);
+  return truncate(cleanDescription, 80);
+});
 
 // --- METHODS ---
+
+function onHeroSlideChange(swiper) {
+  heroCurrentSlideIndex.value = swiper.realIndex;
+}
 
 function navigateToPersonalization() {
   router.push('/personalization');
@@ -59,12 +96,25 @@ function exploreTheme(themeName) {
 
 <template>
   <div class="home-page">
-    <!-- 1. Hero Section -->
+    <!-- 1. Hero Section with Swiper -->
     <section class="hero-section">
-      <div class="hero-background"></div>
-      <div class="hero-content">
+      <Swiper
+        class="hero-swiper"
+        :modules="swiperModules"
+        :slides-per-view="1"
+        :loop="true"
+        :autoplay="{ delay: 5000, disableOnInteraction: false }"
+        :pagination="{ clickable: true }"
+        @slideChange="onHeroSlideChange"
+      >
+        <SwiperSlide v-for="slide in heroSlides" :key="slide.id">
+          <div class="hero-slide-background" :style="{ backgroundImage: `url(${slide.image_url})` }"></div>
+        </SwiperSlide>
+      </Swiper>
+      
+      <div class="hero-content-overlay">
         <h1 class="hero-title">探寻初心之城，开启红色之旅</h1>
-        <p class="hero-subtitle">在上海的红色地标中，发现历史的回响，感受时代的脉搏。</p>
+        <p class="hero-subtitle">{{ dynamicSubtitle }}</p>
         <button @click="navigateToPersonalization" class="hero-cta-button">开始定制您的专属路线</button>
       </div>
     </section>
@@ -81,38 +131,65 @@ function exploreTheme(themeName) {
         </div>
       </section>
 
-      <!-- 3. Featured Attractions Section -->
+      <!-- 3. Featured Attractions Section with Swiper -->
       <section class="content-section">
         <h2 class="section-title">热门景点推荐</h2>
         <div v-if="loading">正在加载...</div>
         <div v-if="error">{{ error }}</div>
-        <div class="attraction-grid">
-          <router-link v-for="attraction in featuredAttractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="attraction-card-link">
-            <div class="attraction-card">
-              <img :src="attraction.image_url" :alt="attraction.name" class="attraction-card-image">
-              <div class="attraction-card-content">
-                <h3 class="attraction-card-title">{{ attraction.name }}</h3>
-                <p class="attraction-card-area">{{ attraction.area }}</p>
+        <Swiper
+          v-if="featuredAttractions.length"
+          class="card-swiper"
+          :modules="swiperModules"
+          :centered-slides="true"
+          :loop="true"
+          :navigation="true"
+          :breakpoints="{
+            700: { slidesPerView: 2.5, spaceBetween: 20 },
+            1024: { slidesPerView: 4, spaceBetween: 30 }
+          }"
+        >
+          <SwiperSlide v-for="attraction in featuredAttractions" :key="attraction.id">
+            <router-link :to="'/attractions/' + attraction.id" class="attraction-card-link">
+              <div class="attraction-card">
+                <img :src="attraction.image_url" :alt="attraction.name" class="attraction-card-image">
+                <div class="attraction-card-content">
+                  <h3 class="attraction-card-title">{{ attraction.name }}</h3>
+                  <p class="attraction-card-area">{{ attraction.area }}</p>
+                </div>
               </div>
-            </div>
-          </router-link>
-        </div>
+            </router-link>
+          </SwiperSlide>
+        </Swiper>
       </section>
 
-      <!-- 4. Featured Routes Section -->
+      <!-- 4. Featured Routes Section with Swiper -->
       <section class="content-section">
         <h2 class="section-title">精选路线</h2>
-        <div class="route-grid">
-           <router-link v-for="route in featuredRoutes" :key="route.id" :to="'/routes/' + route.id" class="route-card-link">
-            <div class="route-card">
-              <div class="route-card-content">
-                <h3 class="route-card-title">{{ route.name }}</h3>
-                <p class="route-card-description">{{ route.description }}</p>
-                <span class="route-card-tag">包含 {{ route.attraction_ids.length }} 个景点</span>
+         <Swiper
+          v-if="featuredRoutes.length"
+          class="card-swiper"
+          :modules="swiperModules"
+          :slides-per-view="1"
+          :space-between="30"
+          :loop="true"
+          :navigation="true"
+          :breakpoints="{
+            700: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 }
+          }"
+        >
+          <SwiperSlide v-for="route in featuredRoutes" :key="route.id">
+             <router-link :to="'/routes/' + route.id" class="route-card-link">
+              <div class="route-card">
+                <div class="route-card-content">
+                  <h3 class="route-card-title">{{ route.name }}</h3>
+                  <p class="route-card-description">{{ route.description }}</p>
+                  <span class="route-card-tag">包含 {{ route.attraction_ids.length }} 个景点</span>
+                </div>
               </div>
-            </div>
-          </router-link>
-        </div>
+            </router-link>
+          </SwiperSlide>
+        </Swiper>
       </section>
     </div>
 
@@ -129,32 +206,38 @@ function exploreTheme(themeName) {
   position: relative;
   height: 60vh;
   min-height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
   color: white;
-  padding: 2rem;
   overflow: hidden;
 }
 
-.hero-background {
+.hero-swiper, .hero-slide-background {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/src/assets/the-bund-hero.jpg'); /* Placeholder - needs a real image */
+}
+
+.hero-slide-background {
   background-size: cover;
   background-position: center;
   filter: brightness(0.6);
-  z-index: 1;
 }
 
-.hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 800px;
+.hero-content-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  z-index: 3;
+  background: transparent;
 }
 
 .hero-title {
@@ -166,8 +249,10 @@ function exploreTheme(themeName) {
 
 .hero-subtitle {
   font-size: 1.25rem;
+  max-width: 600px;
   margin-bottom: 2.5rem;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7);
+  min-height: 50px; /* Reserve space for subtitle */
 }
 
 .hero-cta-button {
@@ -187,14 +272,14 @@ function exploreTheme(themeName) {
 .hero-cta-button:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  background-color: #d63031; /* Slightly darker red */
+  background-color: #d63031;
 }
 
 /* --- General Content Layout --- */
 .page-content {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 4rem 0;
 }
 
 .content-section {
@@ -214,6 +299,9 @@ function exploreTheme(themeName) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
 .theme-card {
@@ -243,16 +331,25 @@ function exploreTheme(themeName) {
   margin: 0;
 }
 
-/* --- Attraction Section --- */
-.attraction-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+/* --- Card Carousel Sections --- */
+.card-swiper {
+  padding: 10px 0;
 }
 
-.attraction-card-link {
+.swiper-slide {
+  height: auto; /* Let content define height */
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack items vertically */
+  align-items: stretch; /* Stretch children to fill width */
+  justify-content: center;
+}
+
+.attraction-card-link, .route-card-link {
   text-decoration: none;
   color: inherit;
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 
 .attraction-card {
@@ -262,6 +359,9 @@ function exploreTheme(themeName) {
   overflow: hidden;
   transition: all 0.3s ease;
   height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .attraction-card:hover {
@@ -273,10 +373,12 @@ function exploreTheme(themeName) {
   width: 100%;
   height: 180px;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .attraction-card-content {
   padding: 1.5rem;
+  flex-grow: 1;
 }
 
 .attraction-card-title {
@@ -291,18 +393,6 @@ function exploreTheme(themeName) {
   margin: 0;
 }
 
-/* --- Route Section --- */
-.route-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-
-.route-card-link {
-  text-decoration: none;
-  color: inherit;
-}
-
 .route-card {
   background: var(--card-background-color);
   border-radius: var(--card-border-radius);
@@ -310,9 +400,11 @@ function exploreTheme(themeName) {
   padding: 2rem;
   transition: all 0.3s ease;
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  text-align: left;
 }
 
 .route-card:hover {
@@ -344,17 +436,49 @@ function exploreTheme(themeName) {
   align-self: flex-start;
 }
 
+/* --- Swiper Custom Styles --- */
+:root {
+  --swiper-theme-color: var(--accent-color);
+}
+
+.hero-section :deep(.swiper-pagination-bullet-active) {
+  background-color: white;
+}
+
+.hero-section :deep(.swiper-pagination-bullet) {
+  background-color: rgba(255, 255, 255, 0.7);
+  width: 10px;
+  height: 10px;
+  transition: all 0.3s ease;
+}
+
+.card-swiper :deep(.swiper-button-prev),
+.card-swiper :deep(.swiper-button-next) {
+  color: var(--accent-color);
+  background-color: white;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  box-shadow: var(--card-shadow);
+}
+
+.card-swiper :deep(.swiper-button-prev::after),
+.card-swiper :deep(.swiper-button-next::after) {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 992px) {
   .hero-title { font-size: 2.8rem; }
-  .route-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
   .hero-title { font-size: 2.2rem; }
   .hero-subtitle { font-size: 1.1rem; }
   .section-title { font-size: 2rem; }
-  .page-content { padding: 3rem 1rem; }
+  .page-content { padding: 3rem 0; }
+  .theme-grid { padding: 0 1rem; }
 }
 
 </style>

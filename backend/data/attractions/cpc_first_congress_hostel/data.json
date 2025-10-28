@@ -1,0 +1,19 @@
+{
+  "id": 10,
+  "name": "中国共产党第一次全国代表大会宿舍旧址",
+  "name_en": "Hostel of the First National Congress of the CPC",
+  "area": "黄浦区",
+  "theme": [
+    "建党伟业",
+    "革命足迹"
+  ],
+  "address": "上海市太仓路127号",
+  "description": "<p>中共一大的代表们曾在此住宿和讨论工作，与又新印刷所、新青年社形成了“理论-住宿-发行”的早期革命活动闭环。</p>",
+  "description_en": "<p>Delegates to the First National Congress of the CPC stayed and discussed their work here, forming a closed loop of early revolutionary activities: \"Theory (New Youth Office) - Accommodation (here) - Publication (Youxin Press)\".</p>",
+  "image_url": "http://127.0.0.1:5000/static/attractions/cpc_first_congress_hostel/IMG20250827101758_1761649905.jpg",
+  "location": {
+    "latitude": null,
+    "longitude": null
+  },
+  "dir_name": "cpc_first_congress_hostel"
+}

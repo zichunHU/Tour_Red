@@ -1,0 +1,19 @@
+{
+  "id": 8,
+  "name": "老渔阳里2号（《新青年》编辑部）",
+  "name_en": "Old Yuyangli No. 2 (New Youth Editorial Office)",
+  "area": "黄浦区",
+  "theme": [
+    "建党伟业",
+    "文化名人"
+  ],
+  "address": "上海市黄浦区南昌路100弄2号",
+  "description": "<p>《新青年》编辑部旧址，陈独秀与维经斯基曾在此会面，毛泽东也曾在此短暂居住。这里是马克思主义在中国传播的重要阵地。</p>",
+  "description_en": "<p>The former editorial office of \"New Youth.\" Chen Duxiu met with Grigori Voitinsky here, and Mao Zedong also briefly resided at this location. It was a significant center for the spread of Marxism in China.</p>",
+  "image_url": "http://127.0.0.1:5000/static/attractions/old_yuyangli_2/IMG20250827131924_1761649816.jpg",
+  "location": {
+    "latitude": null,
+    "longitude": null
+  },
+  "dir_name": "old_yuyangli_2"
+}

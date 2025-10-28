@@ -12,8 +12,8 @@
   "description_en": "<p>Delegates to the First National Congress of the CPC stayed and discussed their work here, forming a closed loop of early revolutionary activities: \"Theory (New Youth Office) - Accommodation (here) - Publication (Youxin Press)\".</p>",
   "image_url": "http://127.0.0.1:5000/static/attractions/cpc_first_congress_hostel/IMG20250827101758_1761649905.jpg",
   "location": {
-    "latitude": null,
-    "longitude": null
+    "latitude": 31.221667,
+    "longitude": 121.475783
   },
   "dir_name": "cpc_first_congress_hostel"
 }

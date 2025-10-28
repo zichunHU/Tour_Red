@@ -73,14 +73,20 @@ def generate_custom_route():
     backend_url = request.host_url.rstrip('/')
     all_attractions = load_raw_attractions()
     
-    # Filter to get only the selected attractions
     selected_attractions = [attr for attr in all_attractions if attr['id'] in data['attraction_ids']]
 
-    if len(selected_attractions) < 2:
-        return jsonify({"error": "Not enough valid attractions found to create a route."}), 400
+    # --- Validation Step ---
+    # Filter for attractions that have valid location data
+    visitable_attractions = [
+        attr for attr in selected_attractions 
+        if attr.get('location') and attr['location'].get('latitude') and attr['location'].get('longitude')
+    ]
+
+    if len(visitable_attractions) < 2:
+        return jsonify({"error": "所选景点中，存在缺少坐标数据的景点，无法生成路线。请先在后台为它们保存一次。"}), 400
 
     # Nearest-neighbor algorithm to sort attractions
-    unvisited = list(selected_attractions)
+    unvisited = list(visitable_attractions)
     ordered_route = []
     current_attraction = unvisited.pop(0)
     ordered_route.append(current_attraction)

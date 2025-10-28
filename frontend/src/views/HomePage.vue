@@ -85,7 +85,7 @@ function onHeroSlideChange(swiper) {
 }
 
 function navigateToPersonalization() {
-  router.push('/personalization');
+  router.push('/customize');
 }
 
 function exploreTheme(themeName) {

@@ -12,8 +12,8 @@
   "description_en": "<p>The former editorial office of \"New Youth.\" Chen Duxiu met with Grigori Voitinsky here, and Mao Zedong also briefly resided at this location. It was a significant center for the spread of Marxism in China.</p>",
   "image_url": "http://127.0.0.1:5000/static/attractions/old_yuyangli_2/IMG20250827131924_1761649816.jpg",
   "location": {
-    "latitude": null,
-    "longitude": null
+    "latitude": 31.219482,
+    "longitude": 121.468797
   },
   "dir_name": "old_yuyangli_2"
 }

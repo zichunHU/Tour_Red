@@ -12,8 +12,8 @@
   "description_en": "<p>The May 30th Movement Monument marks a significant milestone in the Chinese workers' movement, showcasing the inheritance and promotion of the revolutionary spirit.</p>",
   "image_url": "http://127.0.0.1:5000/static/attractions/wusa_movement_monument/1000005378_1761650221.jpeg",
   "location": {
-    "latitude": null,
-    "longitude": null
+    "latitude": 31.234766,
+    "longitude": 121.479633
   },
   "dir_name": "wusa_movement_monument"
 }

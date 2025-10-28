@@ -12,8 +12,8 @@
   "description_en": "<p>The Shanghai General Union played a crucial role in the May 30th Movement as the main command center for the workers' movement, embodying the practice of the original mission.</p>",
   "image_url": "http://127.0.0.1:5000/static/attractions/shanghai_general_union_site/IMG20250827125034_1761649839.jpg",
   "location": {
-    "latitude": null,
-    "longitude": null
+    "latitude": 31.235912,
+    "longitude": 121.483093
   },
   "dir_name": "shanghai_general_union_site"
 }

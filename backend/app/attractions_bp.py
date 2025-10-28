@@ -193,7 +193,7 @@ def update_attraction(attraction_id):
 
     # --- Geocode if address is new or has changed ---
     new_address = data.get('address')
-    if new_address and new_address != attraction_to_update.get('address'):
+    if new_address and (new_address != attraction_to_update.get('address') or not attraction_to_update.get('location') or not attraction_to_update.get('location', {}).get('latitude')): # Also geocode if location is missing
         location = geocode_address(new_address)
         if location:
             data['location'] = location

@@ -12,8 +12,8 @@
   "description_en": "<p>This is the site where the first full Chinese translation of \"The Communist Manifesto\" was printed, marking a key step from theory to publication for Marxist ideas.</p>",
   "image_url": "http://127.0.0.1:5000/static/attractions/youxin_printing_press_site/IMG20250827115250_1761649805.jpg",
   "location": {
-    "latitude": null,
-    "longitude": null
+    "latitude": 31.216769,
+    "longitude": 121.478136
   },
   "dir_name": "youxin_printing_press_site"
 }

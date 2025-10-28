@@ -1,5 +1,6 @@
 import os
 import json
+import math
 from flask import Blueprint, jsonify, request
 from .data_loader import load_raw_attractions, enrich_attraction_urls, ROUTES_DATA_FILE
 
@@ -17,6 +18,21 @@ def write_routes_file(data):
     """Helper to write to the routes data file."""
     with open(ROUTES_DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def calculate_distance(loc1, loc2):
+    """Calculate the Haversine distance between two lat/lon points."""
+    R = 6371  # Earth radius in kilometers
+    lat1, lon1 = math.radians(loc1['latitude']), math.radians(loc1['longitude'])
+    lat2, lon2 = math.radians(loc2['latitude']), math.radians(loc2['longitude'])
+    
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    
+    return R * c
 
 @routes_bp.route('/', methods=['GET'])
 def get_routes():
@@ -47,6 +63,45 @@ def get_route_detail(route_id):
 
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred in route detail: {str(e)}"}), 500
+
+@routes_bp.route('/generate', methods=['POST'])
+def generate_custom_route():
+    data = request.get_json()
+    if not data or 'attraction_ids' not in data or len(data['attraction_ids']) < 2:
+        return jsonify({"error": "Please provide at least two attraction IDs."}), 400
+
+    backend_url = request.host_url.rstrip('/')
+    all_attractions = load_raw_attractions()
+    
+    # Filter to get only the selected attractions
+    selected_attractions = [attr for attr in all_attractions if attr['id'] in data['attraction_ids']]
+
+    if len(selected_attractions) < 2:
+        return jsonify({"error": "Not enough valid attractions found to create a route."}), 400
+
+    # Nearest-neighbor algorithm to sort attractions
+    unvisited = list(selected_attractions)
+    ordered_route = []
+    current_attraction = unvisited.pop(0)
+    ordered_route.append(current_attraction)
+
+    while unvisited:
+        nearest_attraction = min(unvisited, key=lambda attr: calculate_distance(current_attraction['location'], attr['location']))
+        ordered_route.append(nearest_attraction)
+        unvisited.remove(nearest_attraction)
+        current_attraction = nearest_attraction
+
+    # Enrich URLs for the final ordered list
+    enriched_ordered_route = [enrich_attraction_urls(attr, backend_url) for attr in ordered_route]
+
+    # Create a temporary route object to send back
+    custom_route = {
+        "name": "我的专属定制路线",
+        "description": "这是一条根据您的兴趣和选择生成的个性化路线。",
+        "attractions": enriched_ordered_route
+    }
+
+    return jsonify(custom_route)
 
 @routes_bp.route('/', methods=['POST'])
 def create_route():

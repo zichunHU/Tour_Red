@@ -13,7 +13,7 @@
         </div>
 
         <div class="nav-right">
-          <LanguageSwitch />
+          <LanguageMenu />
           <button v-if="isLoggedIn" @click="handleLogout" class="logout-button">{{ $t('nav.logout') }}</button>
         </div>
       </nav>
@@ -27,7 +27,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import LanguageSwitch from './components/LanguageSwitch.vue'
+import LanguageMenu from './components/LanguageMenu.vue'
 
 const router = useRouter()
 const route = useRoute()

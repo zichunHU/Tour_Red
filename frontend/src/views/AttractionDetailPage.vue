@@ -4,12 +4,14 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import MapViewer from '../components/MapViewer.vue' // 导入地图组件
 import GuideCard from '../components/GuideCard.vue'
+import WayfindingCard from '../components/WayfindingCard.vue'
 import { THEME_ICONS } from '../constants/themeIcons.js'
 
 const route = useRoute()
 const router = useRouter()
 
 const attraction = ref(null)
+const wayfindingVisible = ref(false)
 const loading = ref(true)
 const error = ref(null)
 const { locale } = useI18n()
@@ -135,6 +137,7 @@ const goBack = () => {
       </header>
 
       <section class="detail-content">
+        <button class="wf-trigger" @click="wayfindingVisible = true">🧭 {{ $t('map.directions') }}</button>
         <div class="tags">
           <span class="tag area-tag">{{ $t(`areas.${attraction.area}`) }}</span>
           <span v-for="theme in attraction.theme" :key="theme" class="tag theme-tag">{{ THEME_ICONS[theme] }} {{ $t(`themes.${theme}`) }}</span>
@@ -208,6 +211,15 @@ const goBack = () => {
               :name="primaryTitle"
             />
           </aside>
+          
+          <WayfindingCard
+            v-if="attraction"
+            v-model="wayfindingVisible"
+            :name="primaryTitle"
+            :name-secondary="secondaryTitle"
+            :address="primaryAddress"
+            :address-secondary="secondaryAddress"
+          />
         </div>
       </section>
     </article>
@@ -289,6 +301,20 @@ const goBack = () => {
 
 .detail-content {
   padding: 2rem;
+  position: relative;
+}
+.wf-trigger {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border-color);
+  background: var(--background-color);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--primary-text-color);
 }
 
 .tags {
@@ -320,6 +346,7 @@ const goBack = () => {
   margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
+
 
 .address-section p {
   font-size: 1.1rem;

@@ -9,6 +9,7 @@
   ],
   "rating": 4.9,
   "address": "上海市徐汇区龙华西路180号",
+  "address_en": "180 Longhua West Road, Xuhui District, Shanghai",
   "description": "一座集纪念、游览、文化、园林于一体的现代化陵园，安葬着众多为中国革命和建设事业英勇献身的烈士。",
   "description_en": "A modern cemetery that combines commemoration, tourism, culture, and gardens, where many martyrs who died heroically for the Chinese revolution and construction are buried.",
   "image_url": "http://127.0.0.1:5000/static/attractions/longhua_cemetery/IMG20250827113359_1761044614.jpg",

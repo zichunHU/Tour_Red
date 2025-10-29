@@ -1,6 +1,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import MapViewer from '../components/MapViewer.vue'
 import { THEME_ICONS } from '../constants/themeIcons.js'
@@ -11,6 +12,19 @@ const router = useRouter()
 const routeData = ref(null)
 const loading = ref(true)
 const error = ref(null)
+const { locale } = useI18n()
+
+const stripHtml = (s) => (s || '').replace(/<[^>]*>/g, '')
+const truncate = (s, n) => {
+  if (!s) return ''
+  return s.length > n ? s.slice(0, n) + '…' : s
+}
+const getSummary = (a) => {
+  const raw = locale.value === 'en-US'
+    ? (a.summary_en || a.summary || a.description_en || a.description)
+    : (a.summary || a.summary_en || a.description || a.description_en)
+  return truncate(stripHtml(raw), 80)
+}
 
 const routeWaypoints = computed(() => {
   if (!routeData.value || !routeData.value.attractions) {
@@ -49,6 +63,11 @@ onMounted(async () => {
 const goBack = () => {
   router.push('/routes')
 }
+
+// Locale-aware bilingual titles for route attractions
+const isEn = computed(() => locale.value === 'en-US')
+const getPrimaryTitle = (a) => (isEn.value ? (a.name_en || a.name) : a.name)
+const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
 </script>
 
 <template>
@@ -77,8 +96,9 @@ const goBack = () => {
               <div class="attractions-container">
                 <router-link v-for="attraction in routeData.attractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="attraction-card-link">
                   <div class="attraction-card">
-                    <h4>{{ attraction.name }}</h4>
-                    <p>{{ attraction.description.substring(0, 80) }}...</p>
+                    <h4>{{ getPrimaryTitle(attraction) }}</h4>
+                    <p v-if="getSecondaryTitle(attraction)" class="name-secondary">{{ getSecondaryTitle(attraction) }}</p>
+                    <p>{{ getSummary(attraction) }}</p>
                   </div>
                 </router-link>
               </div>
@@ -242,6 +262,12 @@ const goBack = () => {
 .attraction-card p {
   margin: 0;
   color: var(--secondary-text-color);
+}
+
+.name-secondary {
+  margin: 0.1rem 0 0.4rem 0;
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
 }
 
 .error-message {

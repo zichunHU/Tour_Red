@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { ref, computed, onMounted } from 'vue';
 import MapViewer from '../components/MapViewer.vue';
 import Stepper from '../components/Stepper.vue';
@@ -124,6 +125,14 @@ function startOver() {
 
 </script>
 
+<style scoped>
+.name-secondary {
+  margin: 0.1rem 0 0.4rem 0;
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
+}
+</style>
+
 <template>
   <div class="page-container">
     <header class="page-header">
@@ -158,7 +167,8 @@ function startOver() {
             <li v-for="attraction in filteredAttractions" :key="attraction.id" @click="toggleAttractionSelection(attraction.id)" :class="{ selected: selectedAttractions.has(attraction.id) }">
               <div class="card">
                 <div class="card-header">
-                  <h5>{{ attraction.name }}</h5>
+              <h5>{{ getPrimaryTitle(attraction) }}</h5>
+              <p v-if="getSecondaryTitle(attraction)" class="name-secondary">{{ getSecondaryTitle(attraction) }}</p>
                   <span class="area-tag">{{ $t(`areas.${attraction.area}`) }}</span>
                 </div>
               </div>
@@ -199,7 +209,8 @@ function startOver() {
             <li v-for="segment in routeSegments" :key="segment.attraction.id" class="timeline-item">
               <span class="bullet">{{ segment.index + 1 }}</span>
               <div class="route-attraction-info">
-                <h5>{{ segment.attraction.name }}</h5>
+                <h5>{{ getPrimaryTitle(segment.attraction) }}</h5>
+                <p v-if="getSecondaryTitle(segment.attraction)" class="name-secondary">{{ getSecondaryTitle(segment.attraction) }}</p>
                 <p class="address">{{ segment.attraction.address }}</p>
                 <p v-if="segment.index > 0 && segment.distanceFromPrevKm" class="distance">{{ $t('personalization.distanceFromPrevious', { km: segment.distanceFromPrevKm.toFixed(1) }) }}</p>
               </div>
@@ -447,3 +458,8 @@ function startOver() {
   padding-top: 1rem;
 }
 </style>
+// Locale-aware bilingual titles
+const { locale } = useI18n()
+const isEn = computed(() => locale.value === 'en-US')
+const getPrimaryTitle = (a) => (isEn.value ? (a.name_en || a.name) : a.name)
+const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')

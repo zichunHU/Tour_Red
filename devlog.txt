@@ -445,3 +445,36 @@
     *   `frontend/src/views/RouteDetailPage.vue`：路线详情页的主题标签展示图标 + 本地化名称。
 *   **[验证]** 前端预览打开后，以上页面渲染正常，浏览器无错误；主题图标在筛选、标签与详情场景下正确显示。
 *   **[结果]** THEME_ICONS 在多页面中统一复用，视觉与语义一致，后续新增页面可直接引用常量，无需重复定义。
+2025-10-29 — Adopted bilingual summary across pages
+
+- i18n: Added `attractions.summary`, `attractions.summaryZh`, and `attractions.summaryEn` in zh-CN/en-US.
+- HomePage.vue: Hero subtitle prefers `summary/summary_en` with fallback to descriptions; HTML stripped and truncated.
+- AttractionListPage.vue: Card description replaced with language-aware `summary` fallback utility.
+- AttractionDetailPage.vue: Inserted summary line under title with language-aware fallback and styling.
+- RouteDetailPage.vue: Attraction cards now show truncated, stripped `summary` with language-aware fallback.
+- Admin AttractionForm.vue: Added `summary` and `summary_en` fields; initialized in model; labels localized.
+- Preview: Verified no browser errors; language toggle shows summaries where provided, falls back to descriptions otherwise.
+
+
+---
+
+**日期:** 2025年10月29日 (续)
+**阶段:** 首页与路线详情页标题双语显示与主题色修正
+
+*   **[执行] 双语标题辅助函数:**
+    *   在 `HomePage.vue` 与 `RouteDetailPage.vue` 定义并使用 `getPrimaryTitle`，根据当前 `locale` 在 `name`/`name_en` 间选择主标题。
+    *   首页“Popular Attractions”卡片与路线详情页的景点卡片主标题统一采用该函数渲染，确保中英文切换时标题正确显示。
+
+*   **[修复] 解决重复导入与声明导致的编译错误:**
+    *   清理 `RouteDetailPage.vue` 中重复的 `computed`、`useI18n` 导入以及重复的 `const { locale } = useI18n()` 声明。
+    *   **结果:** 终端中 `@babel/parser` 的“重复标识符声明”错误消失，HMR 更新正常；预览不再出现 `net::ERR_ABORTED`。
+
+*   **[优化] 首页热门景点卡片标题颜色与一致性:**
+    *   将英文主标题应用站点主题“强调红色”（与站点其他部分一致），通过 `.title-accent` 类与 `--accent-color` 变量实现；避免使用过于鲜艳的纯红。
+    *   去除中文主标题的红色样式，保持常规风格；英文模式下中文副标题维持次级样式，避免视觉抢夺。
+
+*   **[验证] 预览:**
+    *   启动前端：`npm run dev -- --host`，打开 `http://localhost:5173/`。
+    *   切换中英文分别检查首页与路线详情页：标题渲染与颜色符合预期；浏览器无错误，终端仅见 Dart Sass 旧 API 弃用提醒。
+
+*   **结果:** 首页与路线详情页标题双语显示稳定，主题色统一、风格一致；构建与 HMR 工作正常。

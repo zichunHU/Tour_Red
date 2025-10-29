@@ -1,11 +1,15 @@
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // Reactive state for attractions and loading/error
 const attractions = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+// i18n locale for language-aware fallbacks
+const { locale } = useI18n()
 
 // Reactive state for filter inputs
 const searchKeyword = ref('')
@@ -20,6 +24,24 @@ const themeOptions = THEME_KEYS
 
 // Backend API URL
 const apiUrl = '/api';
+
+// Helpers: strip HTML and get language-aware summary with fallbacks
+const stripHtml = (s) => (s || '').replace(/<[^>]*>/g, '')
+const getSummary = (a) => {
+  const raw = locale.value === 'en-US'
+    ? (a.summary_en || a.summary || a.description_en || a.description)
+    : (a.summary || a.summary_en || a.description || a.description_en)
+  return stripHtml(raw)
+}
+
+// Language-aware titles for cards
+const isEn = computed(() => locale.value === 'en-US')
+const getPrimaryTitle = (a) => {
+  return isEn.value ? (a.name_en || a.name) : (a.name)
+}
+const getSecondaryTitle = (a) => {
+  return isEn.value ? (a.name || '') : ''
+}
 
 // Reusable function to fetch attractions based on current filters
 const fetchAttractions = async () => {
@@ -100,8 +122,9 @@ const handleReset = () => {
         <div class="card">
           <img v-if="attraction.image_url" :src="attraction.image_url" :alt="attraction.name" class="card-image">
           <div class="card-content">
-            <h3>{{ attraction.name }}</h3>
-            <p class="description">{{ attraction.description }}</p>
+            <h3>{{ getPrimaryTitle(attraction) }}</h3>
+            <p v-if="getSecondaryTitle(attraction)" class="name-secondary">{{ getSecondaryTitle(attraction) }}</p>
+            <p class="description">{{ getSummary(attraction) }}</p>
             <small class="area-tag">{{ $t(`areas.${attraction.area}`) }}</small>
           </div>
         </div>
@@ -240,6 +263,12 @@ const handleReset = () => {
   font-size: 1.25rem; /* Slightly smaller to fit better */
   font-weight: 600;
   color: var(--accent-color);
+}
+
+.name-secondary {
+  margin: 0.1rem 0 0.5rem 0;
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
 }
 
 .card .description {

@@ -34,6 +34,11 @@ const interestTags = computed(() => THEME_KEYS.map(code => ({ code, icon: THEME_
 
 const swiperModules = [Autoplay, Pagination, Navigation];
 
+// Locale-aware bilingual titles for attraction cards
+const isEn = computed(() => locale.value === 'en-US')
+const getPrimaryTitle = (a) => (isEn.value ? (a.name_en || a.name) : a.name)
+const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
+
 onMounted(async () => {
   try {
     const [attractionsRes, routesRes] = await Promise.all([
@@ -72,13 +77,13 @@ const featuredRoutes = computed(() => routes.value.slice(0, 4));
 
 const dynamicSubtitle = computed(() => {
   if (!heroSlides.value.length) return t('home.subtitle');
-  const currentAttraction = heroSlides.value[heroCurrentSlideIndex.value];
-  if (!currentAttraction) return t('home.subtitle');
+  const a = heroSlides.value[heroCurrentSlideIndex.value];
+  if (!a) return t('home.subtitle');
   const raw = locale.value === 'en-US'
-    ? (currentAttraction.description_en || currentAttraction.description)
-    : (currentAttraction.description || currentAttraction.description_en);
-  const cleanDescription = stripHtml(raw);
-  return cleanDescription ? truncate(cleanDescription, 80) : t('home.subtitle');
+    ? (a.summary_en || a.summary || a.description_en || a.description)
+    : (a.summary || a.summary_en || a.description || a.description_en);
+  const clean = stripHtml(raw);
+  return clean ? truncate(clean, 80) : t('home.subtitle');
 });
 
 // --- METHODS ---
@@ -156,7 +161,8 @@ function exploreTheme(themeCode) {
               <div class="attraction-card">
                 <img :src="attraction.image_url" :alt="attraction.name" class="attraction-card-image">
                 <div class="attraction-card-content">
-                  <h3 class="attraction-card-title">{{ attraction.name }}</h3>
+                  <h3 class="attraction-card-title" :class="{ 'title-accent': isEn }">{{ getPrimaryTitle(attraction) }}</h3>
+                  <p v-if="getSecondaryTitle(attraction)" class="name-secondary">{{ getSecondaryTitle(attraction) }}</p>
                   <p class="attraction-card-area">{{ $t(`areas.${attraction.area}`) }}</p>
                 </div>
               </div>
@@ -394,6 +400,16 @@ function exploreTheme(themeCode) {
   font-size: 0.9rem;
   color: var(--secondary-text-color);
   margin: 0;
+}
+
+.name-secondary {
+  margin: 0.1rem 0 0.4rem 0;
+  color: var(--secondary-text-color);
+  font-size: 0.95rem;
+}
+
+.title-accent {
+  color: var(--accent-color);
 }
 
 .route-card {

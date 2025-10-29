@@ -16,6 +16,9 @@ const attraction = ref({
   area: '',
   theme: [],
   address: '',
+  address_en: '',
+  summary: '',
+  summary_en: '',
   description: '',
   description_en: '',
   image_url: '' // 初始化为空字符串，而不是默认图片名
@@ -104,8 +107,20 @@ const handleSubmit = async () => {
         <input id="theme" :value="attraction.theme.join(', ')" @input="attraction.theme = $event.target.value.split(',').map(t => t.trim())" type="text">
       </div>
       <div class="form-group">
-        <label for="address">{{ t('attractions.address') }}</label>
+        <label for="address">{{ t('attractions.addressZh') }}</label>
         <input id="address" v-model="attraction.address" type="text">
+      </div>
+      <div class="form-group">
+        <label for="address_en">{{ t('attractions.addressEn') }}</label>
+        <input id="address_en" v-model="attraction.address_en" type="text">
+      </div>
+      <div class="form-group">
+        <label for="summary_zh">{{ t('attractions.summaryZh') }}</label>
+        <textarea id="summary_zh" v-model="attraction.summary" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="summary_en">{{ t('attractions.summaryEn') }}</label>
+        <textarea id="summary_en" v-model="attraction.summary_en" rows="3"></textarea>
       </div>
       <div class="form-group">
         <label>{{ t('attractions.descriptionZh') }}</label>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import MapViewer from '../components/MapViewer.vue' // 导入地图组件
 import { THEME_ICONS } from '../constants/themeIcons.js'
@@ -10,8 +11,49 @@ const router = useRouter()
 const attraction = ref(null)
 const loading = ref(true)
 const error = ref(null)
+const { locale } = useI18n()
 
 const apiUrl = '/api';
+
+const stripHtml = (s) => (s || '').replace(/<[^>]*>/g, '')
+const summaryLine = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  const raw = locale.value === 'en-US'
+    ? (a.summary_en || a.summary || a.description_en || a.description)
+    : (a.summary || a.summary_en || a.description || a.description_en)
+  return stripHtml(raw)
+})
+
+// Language-aware title and description (strict: show only current language)
+const isEn = computed(() => locale.value === 'en-US')
+const primaryTitle = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.name_en || a.name || '') : (a.name || a.name_en || '')
+})
+const secondaryTitle = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.name || '') : (a.name_en || '')
+})
+const descriptionHtml = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.description_en || '') : (a.description || '')
+})
+
+// Language-aware address: show current language first, other language second
+const primaryAddress = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.address_en || a.address || '') : (a.address || a.address_en || '')
+})
+const secondaryAddress = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.address || '') : (a.address_en || '')
+})
 
 onMounted(async () => {
   const attractionId = route.params.id
@@ -47,8 +89,9 @@ const goBack = () => {
       
       <header class="detail-header">
         <button @click="goBack" class="back-button">&larr; {{ $t('common.back') }}</button>
-        <h1>{{ attraction.name }}</h1>
-        <p class="name-en">{{ attraction.name_en }}</p>
+        <h1>{{ primaryTitle }}</h1>
+        <p v-if="secondaryTitle" class="name-secondary">{{ secondaryTitle }}</p>
+        <p v-if="summaryLine" class="summary">{{ summaryLine }}</p>
       </header>
 
       <section class="detail-content">
@@ -57,23 +100,22 @@ const goBack = () => {
           <span v-for="theme in attraction.theme" :key="theme" class="tag theme-tag">{{ THEME_ICONS[theme] }} {{ $t(`themes.${theme}`) }}</span>
         </div>
 
-        <div v-if="attraction.address" class="address-section">
-          <p><strong>{{ $t('attractions.address') }}:</strong> {{ attraction.address }}</p>
+        <div v-if="primaryAddress || secondaryAddress" class="address-section">
+          <p v-if="primaryAddress"><strong>{{ $t('attractions.address') }}:</strong> {{ primaryAddress }}</p>
+          <p v-if="secondaryAddress" class="address-secondary">{{ secondaryAddress }}</p>
         </div>
         
         <div class="content-grid">
           <div class="description-container">
             <div class="description">
               <h3>{{ $t('attractions.description') }}</h3>
-              <div v-html="attraction.description" class="markdown-content"></div>
-
-              <h3>{{ $t('attractions.description') }}</h3>
-              <div v-html="attraction.description_en" class="markdown-content"></div>
+              <div v-if="descriptionHtml" v-html="descriptionHtml" class="markdown-content"></div>
+              <p v-else class="no-description">{{ $t('messages.dataNotFound') }}</p>
             </div>
           </div>
 
           <aside class="map-container">
-            <h3>{{ $t('map.loading') }}</h3>
+            <h3>{{ $t('map.location') }}</h3>
             <MapViewer 
               v-if="attraction.location && attraction.location.latitude && attraction.location.longitude"
               :latitude="attraction.location.latitude" 
@@ -146,6 +188,18 @@ const goBack = () => {
 
 .detail-header .name-en {
   font-size: 1.2rem;
+  color: var(--secondary-text-color);
+  margin-top: 0.5rem;
+}
+
+.detail-header .name-secondary {
+  font-size: 1.2rem;
+  color: var(--secondary-text-color);
+  margin-top: 0.5rem;
+}
+
+.detail-header .summary {
+  font-size: 1rem;
   color: var(--secondary-text-color);
   margin-top: 0.5rem;
 }
@@ -240,6 +294,16 @@ const goBack = () => {
   border-radius: 12px; /* A slightly smaller radius than the card */
   margin: 1.5rem 0;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.no-description {
+  color: var(--secondary-text-color);
+  font-size: 0.95rem;
+}
+
+.address-secondary {
+  color: var(--secondary-text-color);
+  font-size: 0.95rem;
 }
 
 .error-message {

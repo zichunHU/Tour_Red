@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router';
 
 // Import Swiper Vue.js components
@@ -13,8 +14,10 @@ import 'swiper/css/autoplay';
 
 // import required modules
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { THEME_KEYS } from '../constants/catalog.js'
 
 const router = useRouter();
+const { t } = useI18n()
 
 // --- STATE & DATA FETCHING ---
 const attractions = ref([]);
@@ -23,14 +26,23 @@ const loading = ref(true);
 const error = ref(null);
 const heroCurrentSlideIndex = ref(0);
 
-const interestTags = ref([
-  { name: '建党伟业', icon: '🏛️' },
-  { name: '革命足迹', icon: '👣' },
-  { name: '工人运动', icon: '✊' },
-  { name: '抗日战争', icon: '🔥' },
-  { name: '伟人故居', icon: '🏠' },
-  { name: '文化名人', icon: '✒️' },
-]);
+// Theme icons mapping (keys align with THEME_KEYS)
+const THEME_ICONS = {
+  '建党伟业': '🏛️',
+  '革命足迹': '👣',
+  '工人运动': '✊',
+  '革命烈士': '🕯️',
+  '抗日战争': '🛡️',
+  '伟人故居': '🏠',
+  '文化名人': '✒️',
+  '地标': '🏙️',
+  '观光': '🧭',
+  '古典园林': '🌿',
+  '历史': '📜'
+}
+
+// Drive theme cards from THEME_KEYS to avoid duplication
+const interestTags = computed(() => THEME_KEYS.map(code => ({ code, icon: THEME_ICONS[code] || '🏷️' })))
 
 const swiperModules = [Autoplay, Pagination, Navigation];
 
@@ -71,11 +83,11 @@ const featuredAttractions = computed(() => attractions.value.slice(0, 8));
 const featuredRoutes = computed(() => routes.value.slice(0, 4));
 
 const dynamicSubtitle = computed(() => {
-  if (!heroSlides.value.length) return "在上海的红色地标中，发现历史的回响，感受时代的脉搏。";
+  if (!heroSlides.value.length) return t('home.subtitle');
   const currentAttraction = heroSlides.value[heroCurrentSlideIndex.value];
-  if (!currentAttraction) return "";
+  if (!currentAttraction) return t('home.subtitle');
   const cleanDescription = stripHtml(currentAttraction.description);
-  return truncate(cleanDescription, 80);
+  return cleanDescription ? truncate(cleanDescription, 80) : t('home.subtitle');
 });
 
 // --- METHODS ---
@@ -88,8 +100,8 @@ function navigateToPersonalization() {
   router.push('/customize');
 }
 
-function exploreTheme(themeName) {
-  router.push({ path: '/attractions', query: { theme: themeName } });
+function exploreTheme(themeCode) {
+  router.push({ path: '/attractions', query: { theme: themeCode } });
 }
 
 </script>
@@ -124,9 +136,9 @@ function exploreTheme(themeName) {
       <section class="content-section">
         <h2 class="section-title">{{ $t('home.exploreByTheme') }}</h2>
         <div class="theme-grid">
-          <div v-for="theme in interestTags" :key="theme.name" class="theme-card" @click="exploreTheme(theme.name)">
+          <div v-for="theme in interestTags" :key="theme.code" class="theme-card" @click="exploreTheme(theme.code)">
             <div class="theme-icon">{{ theme.icon }}</div>
-            <h3 class="theme-name">{{ theme.name }}</h3>
+            <h3 class="theme-name">{{ $t(`themes.${theme.code}`) }}</h3>
           </div>
         </div>
       </section>
@@ -154,7 +166,7 @@ function exploreTheme(themeName) {
                 <img :src="attraction.image_url" :alt="attraction.name" class="attraction-card-image">
                 <div class="attraction-card-content">
                   <h3 class="attraction-card-title">{{ attraction.name }}</h3>
-                  <p class="attraction-card-area">{{ attraction.area }}</p>
+                  <p class="attraction-card-area">{{ $t(`areas.${attraction.area}`) }}</p>
                 </div>
               </div>
             </router-link>

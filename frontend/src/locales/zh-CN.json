@@ -30,7 +30,8 @@
     "searchPlaceholder": "搜索关键词...",
     "actions": "操作",
     "create": "新建",
-    "example": "例如: 1, 2, 3"
+    "example": "例如: 1, 2, 3",
+    "uploading": "上传中..."
   },
   "auth": {
     "login": "登录",
@@ -108,7 +109,13 @@
     "timeline": "行程安排",
     "totalDistance": "总里程",
     "segmentDistance": "段距离",
-    "selectAttractionsWithCount": "选择您想去的景点 (已选 {count} 个)"
+    "selectAttractionsWithCount": "选择您想去的景点 (已选 {count} 个)",
+    "generating": "正在生成...",
+    "generateMyRoute": "生成我的专属路线",
+    "selectAtLeastTwo": "请至少选择两个景点以生成路线",
+    "recommendedOrder": "推荐路线顺序",
+    "totalDistanceApprox": "总里程约：{km} 公里",
+    "distanceFromPrevious": "距离上一个点 ≈ {km} 公里"
   },
   "admin": {
     "dashboard": "管理面板",
@@ -135,7 +142,13 @@
     "invalidInput": "输入格式不正确",
     "deleteFailed": "删除失败: {error}",
     "deleteConfirmAttraction": "确定要删除这个景点吗？此操作不可撤销。",
-    "deleteConfirmRoute": "确定要删除这条路线吗？此操作不可撤销。"
+    "deleteConfirmRoute": "确定要删除这条路线吗？此操作不可撤销。",
+    "uploadFailed": "图片上传失败: {error}"
+  },
+  "upload": {
+    "noImage": "无图片",
+    "selectAndUpload": "选择并上传图片",
+    "saveAttractionHint": "请先保存景点以启用图片上传。"
   },
   "themes": {
     "革命足迹": "革命足迹",

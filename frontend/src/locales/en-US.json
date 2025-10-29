@@ -29,7 +29,8 @@
     "no": "No",
     "searchPlaceholder": "Search keywords...",
     "actions": "Actions",
-    "create": "Create"
+    "create": "Create",
+    "uploading": "Uploading..."
   },
   "auth": {
     "login": "Login",
@@ -97,7 +98,13 @@
     "timeline": "Itinerary",
     "totalDistance": "Total Distance",
     "segmentDistance": "Segment Distance",
-    "selectAttractionsWithCount": "Choose attractions you want to visit (selected {count})"
+    "selectAttractionsWithCount": "Choose attractions you want to visit (selected {count})",
+    "generating": "Generating...",
+    "generateMyRoute": "Generate My Route",
+    "selectAtLeastTwo": "Select at least two attractions to generate a route",
+    "recommendedOrder": "Recommended Route Order",
+    "totalDistanceApprox": "Total distance approx: {km} km",
+    "distanceFromPrevious": "Distance from previous ≈ {km} km"
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -124,7 +131,13 @@
     "invalidInput": "Invalid input format",
     "deleteFailed": "Delete failed: {error}",
     "deleteConfirmAttraction": "Are you sure you want to delete this attraction? This action cannot be undone.",
-    "deleteConfirmRoute": "Are you sure you want to delete this route? This action cannot be undone."
+    "deleteConfirmRoute": "Are you sure you want to delete this route? This action cannot be undone.",
+    "uploadFailed": "Image upload failed: {error}"
+  },
+  "upload": {
+    "noImage": "No image",
+    "selectAndUpload": "Select and upload image",
+    "saveAttractionHint": "Please save the attraction first to enable image upload."
   },
   "themes": {
     "革命足迹": "Revolutionary Footprints",

@@ -38,6 +38,9 @@ import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import { watch, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   modelValue: {
@@ -98,7 +101,7 @@ const addImage = async () => {
       })
 
       if (!response.ok) {
-        throw new Error('Image upload failed')
+        throw new Error(t('messages.uploadFailed', { error: `${response.status} ${response.statusText}` }))
       }
 
       const data = await response.json()
@@ -107,7 +110,7 @@ const addImage = async () => {
       }
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('图片上传失败: ' + error.message)
+      alert(t('messages.uploadFailed', { error: error.message }))
     }
   }
   input.click()

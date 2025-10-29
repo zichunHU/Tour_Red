@@ -12,9 +12,10 @@ const searchKeyword = ref('')
 const selectedArea = ref('')
 const selectedTheme = ref('')
 
-// Hardcoded options for filters (in a real app, this might come from an API)
-const areaOptions = ['黄浦区', '徐汇区']
-const themeOptions = ['革命足迹', '建党伟业', '革命烈士', '抗日战争', '伟人故居', '文化名人']
+// Unified options from catalog (codes mapped to i18n for display)
+import { AREA_KEYS, THEME_KEYS } from '../constants/catalog.js'
+const areaOptions = AREA_KEYS
+const themeOptions = THEME_KEYS
 
 // Backend API URL
 const apiUrl = '/api';

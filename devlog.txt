@@ -73,6 +73,53 @@
     *   **结果:** 成功完成了“浏览路线 -> 点击 -> 查看路线详情（含景点列表）”的核心用户流程，应用内容得到扩充。
 
 ---
+**日期:** 2025年10月29日
+**阶段:** 国际化改造（二）个性化与上传文案补齐
+
+*   **[新增] i18n 词典键补充:**
+    *   `frontend/src/locales/zh-CN.json`：新增 `common.uploading`、`messages.uploadFailed`，补充 `personalization` 下的生成状态、按钮、提示与里程显示键；新增 `upload` 命名空间（`noImage`、`selectAndUpload`、`saveAttractionHint`）。
+    *   `frontend/src/locales/en-US.json`：与中文保持同步，新增对应键与 `upload` 命名空间。
+
+*   **[改造] 个性化页面文案国际化:**
+    *   文件：`frontend/src/views/PersonalizationPage.vue`
+    *   变更：将“正在生成…/生成我的专属路线/请至少选择两个…”等硬编码中文替换为 `personalization.*` 键；“推荐路线顺序/总里程约/距离上一个点≈X公里”改为参数化 i18n；列表卡片区域显示改为 `$t('areas.${attraction.area}')`。
+
+*   **[改造] 上传与富文本组件国际化:**
+    *   文件：`frontend/src/components/SingleImageUpload.vue`
+        *   模板：将“无图片/上传中…/选择并上传图片/请先保存景点…”替换为 `upload.*` 与 `common.uploading` 键。
+        *   逻辑：引入 `useI18n`，上传失败错误信息使用 `t('messages.uploadFailed', { error })`。
+    *   文件：`frontend/src/components/RichTextEditor.vue`
+        *   逻辑：引入 `useI18n`，当响应非 200 时以及 `catch` 中的提示统一为 `messages.uploadFailed`。
+
+*   **[验证] 预览检查:**
+    *   打开前端预览，首页、个性化页面、上传组件及富文本图片上传的相关文案均正常显示；浏览器无报错，建议终端同步检查是否有新错误输出。
+
+*   **[范围声明]**
+    *   本次改动未触及 `AttractionDetailPage.vue` 与 `RouteDetailPage.vue`（维持此前约定）。
+
+---
+**日期:** 2025年10月29日 (续)
+**阶段:** 国际化改造（三）首页轮播兜底文案抽离
+
+*   **[改造] 首页动态副标题兜底文案:**
+    *   文件：`frontend/src/views/HomePage.vue`
+    *   变更：引入 `useI18n`，`dynamicSubtitle` 逻辑改为在无轮播图或当前景点 `description` 为空时使用 `t('home.subtitle')` 作为兜底文案，避免中文硬编码。
+
+*   **[验证] 预览检查:**
+    *   打开前端预览，首页在无描述或无轮播图时正确显示 i18n 兜底副标题；浏览器无错误。
+
+---
+**日期:** 2025年10月29日 (续2)
+**阶段:** 首页主题卡片与代码表统一
+
+*   **[重构] 主题卡片来源统一:**
+    *   文件：`frontend/src/views/HomePage.vue`
+    *   变更：移除静态 `interestTags` 数组，新增本地 `THEME_ICONS` 映射；使用 `THEME_KEYS` 生成 `interestTags`（`[{ code, icon }]`），实现卡片列表由代码表驱动，避免重复维护。
+
+*   **[验证] 预览检查:**
+    *   首页主题卡片按 `THEME_KEYS` 渲染，图标正常显示；浏览器无错误。
+
+---
 
 **日期:** 2025年10月16日 (续)
 **阶段:** 核心功能增强与架构重构
@@ -358,3 +405,20 @@
     *   按要求此次未改动景点详情与路线详情列表（`AttractionDetailPage.vue`、`RouteDetailPage.vue`）。
 
 *   **结果:** 已完成前端界面中文硬编码的审计与清单整理，后续可分批次将上述位置替换为 i18n 键并补充词典，确保中英文一致性。
+
+---
+
+**日期:** 2025年10月29日 (续)
+**阶段:** 主题/区域统一（使用代码表 + i18n 映射）
+
+*   **[新增] 代码表:**
+    *   新增 `frontend/src/constants/catalog.js`，提供 `THEME_KEYS` 与 `AREA_KEYS`，与后端数据中的主题/区域值一致（中文为代码）。
+
+*   **[更新] 页面使用代码映射 + i18n 显示：**
+    *   `AttractionListPage.vue`：筛选选项改为引用 `AREA_KEYS`、`THEME_KEYS`，展示仍用 `$t('areas.*')` / `$t('themes.*')`。
+    *   `HomePage.vue`：主题卡片改为 `code + icon`，名称显示改为 `$t('themes.'+code)`；卡片点击传递 `theme=code`；精选景点卡片区域显示改为 `$t('areas.'+area)`。
+    *   `PersonalizationPage.vue`：兴趣标签来源改为 `THEME_KEYS`，标签显示改为 `$t('themes.'+code)`。
+
+*   **[验证] 预览:** 打开 `http://localhost:5173/`，浏览器无错误；终端无新增错误日志。
+
+*   **结果:** 页面上的主题与区域已统一使用代码并通过 i18n 显示，减少硬编码，后续维护更顺畅；未改动景点详情与路线详情列表。

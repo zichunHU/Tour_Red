@@ -39,7 +39,8 @@ const totalDistanceKm = computed(() => routeSegments.value.reduce((sum, s) => su
 const step = ref('selection');
 
 // Step 1: Tag and Attraction Selection
-const interestTags = ref(['革命足迹', '建党伟业', '革命烈士', '抗日战争', '伟人故居', '文化名人']);
+import { THEME_KEYS } from '../constants/catalog.js'
+const interestTags = ref(THEME_KEYS);
 const selectedTags = ref([]);
 const allAttractions = ref([]);
 const selectedAttractions = ref(new Set()); // Using a Set for efficient add/delete
@@ -141,7 +142,7 @@ function startOver() {
             :key="tag"
             :selected="selectedTags.includes(tag)"
             @toggle="() => { const i = selectedTags.indexOf(tag); if (i >= 0) selectedTags.splice(i,1); else selectedTags.push(tag); }"
-          >{{ tag }}</TagChip>
+          >{{ $t(`themes.${tag}`) }}</TagChip>
         </div>
       </div>
 
@@ -157,7 +158,7 @@ function startOver() {
               <div class="card">
                 <div class="card-header">
                   <h5>{{ attraction.name }}</h5>
-                  <span class="area-tag">{{ attraction.area }}</span>
+                  <span class="area-tag">{{ $t(`areas.${attraction.area}`) }}</span>
                 </div>
               </div>
             </li>
@@ -176,11 +177,11 @@ function startOver() {
       <!-- Action Button -->
       <div class="actions-footer sticky">
         <button @click="handleGenerateRoute" :disabled="selectedAttractions.size < 2 || loading" class="button-primary">
-          <span v-if="loading">正在生成...</span>
-          <span v-else>生成我的专属路线</span>
+          <span v-if="loading">{{ $t('personalization.generating') }}</span>
+          <span v-else>{{ $t('personalization.generateMyRoute') }}</span>
         </button>
         <p v-if="selectedAttractions.size < 2" class="disabled-reason">
-          请至少选择两个景点以生成路线
+          {{ $t('personalization.selectAtLeastTwo') }}
         </p>
       </div>
     </section>
@@ -189,9 +190,9 @@ function startOver() {
     <section v-if="step === 'results' && generatedRoute">
       <div class="results-grid">
         <div class="route-list-container">
-          <h4>推荐路线顺序</h4>
+          <h4>{{ $t('personalization.recommendedOrder') }}</h4>
           <div class="route-summary" v-if="totalDistanceKm">
-            总里程约：{{ totalDistanceKm.toFixed(1) }} 公里
+            {{ $t('personalization.totalDistanceApprox', { km: totalDistanceKm.toFixed(1) }) }}
           </div>
           <ol class="route-list">
             <li v-for="segment in routeSegments" :key="segment.attraction.id" class="timeline-item">
@@ -199,7 +200,7 @@ function startOver() {
               <div class="route-attraction-info">
                 <h5>{{ segment.attraction.name }}</h5>
                 <p class="address">{{ segment.attraction.address }}</p>
-                <p v-if="segment.index > 0 && segment.distanceFromPrevKm" class="distance">距离上一个点 ≈ {{ segment.distanceFromPrevKm.toFixed(1) }} 公里</p>
+                <p v-if="segment.index > 0 && segment.distanceFromPrevKm" class="distance">{{ $t('personalization.distanceFromPrevious', { km: segment.distanceFromPrevKm.toFixed(1) }) }}</p>
               </div>
             </li>
           </ol>

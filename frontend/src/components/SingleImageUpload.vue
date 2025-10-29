@@ -4,7 +4,7 @@
       <img :src="currentImageUrl" alt="Current Image" />
     </div>
     <div v-else class="image-placeholder">
-      <p>无图片</p>
+      <p>{{ $t('upload.noImage') }}</p>
     </div>
 
     <input
@@ -15,15 +15,18 @@
       style="display: none;"
     />
     <button type="button" @click="triggerFileInput" :disabled="!attractionId || attractionId === 0 || uploading">
-      {{ uploading ? '上传中...' : '选择并上传图片' }}
+      {{ uploading ? $t('common.uploading') : $t('upload.selectAndUpload') }}
     </button>
-    <p v-if="!attractionId || attractionId === 0" class="upload-hint">请先保存景点以启用图片上传。</p>
+    <p v-if="!attractionId || attractionId === 0" class="upload-hint">{{ $t('upload.saveAttractionHint') }}</p>
     <p v-if="error" class="error-message">{{ error }}</p>
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   modelValue: {
@@ -71,7 +74,7 @@ const handleFileChange = async (event) => {
 
     if (!response.ok) {
       const errorText = await response.text()
-      throw new Error(`图片上传失败: ${response.status} ${response.statusText} - ${errorText}`)
+      throw new Error(t('messages.uploadFailed', { error: `${response.status} ${response.statusText} - ${errorText}` }))
     }
 
     const data = await response.json()

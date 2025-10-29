@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import MapViewer from '../components/MapViewer.vue';
+import Stepper from '../components/Stepper.vue';
+import TagChip from '../components/TagChip.vue';
+import LoadingSkeleton from '../components/LoadingSkeleton.vue';
+import Toast from '../components/Toast.vue';
 
 // --- STATE MANAGEMENT ---
 
@@ -96,6 +100,7 @@ function startOver() {
     <header class="page-header">
       <h2>个性化路线定制</h2>
       <p>选择您感兴趣的主题和景点，我们将为您生成专属的红色路线</p>
+      <Stepper :steps="[{ key: 'selection', label: '选择' }, { key: 'results', label: '结果' }]" :current="step" />
     </header>
 
     <!-- Step 1: Selection Phase -->
@@ -104,15 +109,17 @@ function startOver() {
       <div class="filters-container">
         <h4>1. 选择兴趣主题</h4>
         <div class="tag-group">
-          <label v-for="tag in interestTags" :key="tag" class="tag-label">
-            <input type="checkbox" :value="tag" v-model="selectedTags">
-            <span>{{ tag }}</span>
-          </label>
+          <TagChip
+            v-for="tag in interestTags"
+            :key="tag"
+            :selected="selectedTags.includes(tag)"
+            @toggle="() => { const i = selectedTags.indexOf(tag); if (i >= 0) selectedTags.splice(i,1); else selectedTags.push(tag); }"
+          >{{ tag }}</TagChip>
         </div>
       </div>
 
-      <div v-if="loading">正在加载景点...</div>
-      <div v-if="error" class="error-message">{{ error }}</div>
+      <LoadingSkeleton v-if="loading" :count="6" />
+      <Toast v-if="error" :visible="true" :message="error" type="error" @close="error = null" />
 
       <!-- Attraction Selection -->
       <div v-if="!loading && !error" class="selection-grid">
@@ -120,8 +127,12 @@ function startOver() {
           <h4>2. 选择您想去的景点 (已选 {{ selectedAttractions.size }} 个)</h4>
           <ul class="attraction-list">
             <li v-for="attraction in filteredAttractions" :key="attraction.id" @click="toggleAttractionSelection(attraction.id)" :class="{ selected: selectedAttractions.has(attraction.id) }">
-              <h5>{{ attraction.name }}</h5>
-              <p>{{ attraction.area }}</p>
+              <div class="card">
+                <div class="card-header">
+                  <h5>{{ attraction.name }}</h5>
+                  <span class="area-tag">{{ attraction.area }}</span>
+                </div>
+              </div>
             </li>
           </ul>
         </div>
@@ -136,7 +147,7 @@ function startOver() {
       </div>
 
       <!-- Action Button -->
-      <div class="actions-footer">
+      <div class="actions-footer sticky">
         <button @click="handleGenerateRoute" :disabled="selectedAttractions.size < 2 || loading" class="button-primary">
           <span v-if="loading">正在生成...</span>
           <span v-else>生成我的专属路线</span>
@@ -167,7 +178,7 @@ function startOver() {
         </div>
       </div>
 
-      <div class="actions-footer">
+      <div class="actions-footer sticky">
         <button @click="startOver" class="button-secondary">重新规划</button>
       </div>
     </section>
@@ -338,5 +349,37 @@ function startOver() {
 .results-header {
   text-align: center;
   margin-bottom: 2rem;
+}
+.tag-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.attraction-list li { cursor: pointer; }
+.attraction-list .card {
+  background: var(--card-background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.attraction-list .card:hover { background: var(--background-color); }
+.attraction-list .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.area-tag {
+  font-size: 0.8rem;
+  color: var(--secondary-text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.15rem 0.5rem;
+}
+.attraction-list li.selected .card { border-color: var(--accent-color); }
+
+.actions-footer.sticky {
+  position: sticky;
+  bottom: 0;
+  background: var(--card-background-color);
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
 }
 </style>

@@ -349,6 +349,7 @@ const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
   border-radius: var(--card-border-radius);
   box-shadow: var(--card-shadow);
   padding: 0.75rem;
+  box-sizing: border-box; /* Include padding in the height for child 100% sizing */
   height: 80vh;
   position: sticky;
   top: 1rem;

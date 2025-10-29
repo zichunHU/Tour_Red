@@ -282,6 +282,11 @@ const goBack = () => {
   border-radius: var(--card-border-radius);
 }
 
+/* Ensure the map viewer has a stable height to prevent overlay drift */
+.map-container :deep(.map-viewer) {
+  height: 400px;
+}
+
 .markdown-content ::v-deep(p) {
   line-height: 1.7;
   color: var(--secondary-text-color);

@@ -192,6 +192,7 @@ const durationTag = computed(() => {
   position: sticky;
   top: 2rem; /* Stick to the top while scrolling */
   padding: 1.5rem;
+  box-sizing: border-box;
 }
 
 /* Adjust map viewer height within this specific page */

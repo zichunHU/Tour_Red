@@ -30,6 +30,7 @@ const amapLoaded = ref(false);
 let map = null; // To hold the map instance
 const markers = []; // To keep track of added markers
 let resizeObserver = null; // Observe container size changes
+let lastView = { type: 'none', points: [] }; // Track current view mode for refitting on resize
 
 // A reactive ref to hold a normalized list of points
 const points = ref([]);
@@ -52,21 +53,30 @@ const initMap = () => {
     return;
   }
   amapLoaded.value = true;
+  const rect = mapContainer.value?.getBoundingClientRect();
+  console.debug('[MapViewer] initMap container rect:', rect, 'DPR:', window.devicePixelRatio);
   map = new AMap.Map(mapContainer.value, {
-    zoom: 11, // Adjusted default zoom
+    zoom: 11,
     viewMode: '3D',
-    center: [121.4737, 31.2304] // Center on Shanghai
+    resizeEnable: true,
+    center: [121.4737, 31.2304]
   });
   updateMap(points.value);
   // Ensure map reflows when container size changes
   if (mapContainer.value && typeof ResizeObserver !== 'undefined') {
     resizeObserver = new ResizeObserver(() => {
       if (map) {
+        console.debug('[MapViewer] ResizeObserver trigger: resizing map');
         map.resize();
+        // Refit view after resize to avoid perceived marker drift
+        refitView();
       }
     });
     resizeObserver.observe(mapContainer.value);
   }
+  // Additional resilience: handle orientation and visibility changes
+  window.addEventListener('orientationchange', () => { if (map) { map.resize(); refitView(); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && map) { map.resize(); refitView(); } });
 };
 
 const updateMap = (currentPoints) => {
@@ -87,8 +97,12 @@ const updateMap = (currentPoints) => {
     // Original single point logic (non-interactive)
     map.setCenter(amapPoints[0].lnglat);
     map.setZoom(15);
-    const marker = new AMap.Marker({ position: amapPoints[0].lnglat, offset: new AMap.Pixel(-13, -30) });
+    const marker = new AMap.Marker({
+      position: amapPoints[0].lnglat,
+      anchor: 'bottom-center'
+    });
     map.add(marker);
+    lastView = { type: 'single', points: amapPoints };
   } else if (amapPoints.length > 1 && !props.interactionEnabled) {
     // Original multi-point route planning logic
     const driving = new AMap.Driving({ map: map, policy: AMap.DrivingPolicy.LEAST_TIME });
@@ -98,6 +112,7 @@ const updateMap = (currentPoints) => {
     driving.search(start, end, { waypoints: waypoints }, (status, result) => {
       if (status !== 'complete') console.error('Failed to get driving route:', result);
     });
+    lastView = { type: 'route', points: amapPoints };
   } else {
     // New interactive marker logic
     amapPoints.forEach(point => {
@@ -109,7 +124,7 @@ const updateMap = (currentPoints) => {
           image: isSelected ? '//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png' : '//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
           imageSize: isSelected ? new AMap.Size(30, 40) : new AMap.Size(25, 34),
         }),
-        offset: isSelected ? new AMap.Pixel(-15, -40) : new AMap.Pixel(-13, -34),
+        anchor: 'bottom-center',
         extData: { id: point.id } // Store ID for click events
       });
 
@@ -122,8 +137,22 @@ const updateMap = (currentPoints) => {
     });
     map.add(markers);
     if (markers.length > 0) {
-      map.setFitView();
+      map.setFitView(markers);
     }
+    lastView = { type: 'markers', points: amapPoints };
+  }
+  const size = map.getSize();
+  console.debug('[MapViewer] updateMap points:', amapPoints.length, 'map size:', size?.width, size?.height, 'DPR:', window.devicePixelRatio);
+};
+
+const refitView = () => {
+  if (!map) return;
+  if (lastView.type === 'single' && lastView.points.length) {
+    map.setCenter(lastView.points[0].lnglat);
+  } else if (lastView.type === 'markers' && markers.length) {
+    map.setFitView(markers);
+  } else if (lastView.type === 'route') {
+    // Driving layer manages its own view; calling resize is sufficient
   }
 };
 
@@ -155,6 +184,8 @@ watch([points, () => props.selectedIds], () => {
   width: 100%;
   height: 100%; /* Fill parent container height */
   min-height: 360px; /* Sensible minimum to avoid collapse */
+  position: relative; /* Ensure proper absolute child positioning */
+  display: block;
   border-radius: var(--card-border-radius);
 }
 .map-fallback {

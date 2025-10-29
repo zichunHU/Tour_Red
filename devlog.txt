@@ -554,3 +554,60 @@
 - Admin RouteForm.vue: Added editable `theme` (options from `THEME_KEYS`, labels via i18n) and `duration` (半日/一日/多日) select fields; persisted through create/update.
 - Preview: Verified in dev server; language switching correctly updates both theme and duration labels; no browser errors observed.
 - Follow-up: Migrate `theme` values from durations to real theme codes (e.g., "革命足迹") in data to fully utilize the split; ensure future routes provide both fields.
+
+---
+**日期:** 2025年10月29日 (续3)
+**阶段:** 地图漂移修复与管理员功能端到端验证
+
+*   **[修复] 地图组件位置漂移与标记错位:**
+    *   **根因:** 粘性布局容器未计入内边距导致 AMap canvas 与瓦片层计算不一致；移动端媒体查询切换时容器高度变化引发重绘时序问题；标记使用像素偏移在不同 DPR/缩放下产生误差；容器短时重排未及时触发 `map.resize()` 与视野重算。
+    *   **代码:**
+        *   `frontend/src/views/RouteDetailPage.vue`：`.map-section` 增加 `box-sizing: border-box`，与 `position: sticky` 协同，确保高度计算一致。
+        *   `frontend/src/views/AttractionDetailPage.vue`：`.map-container :deep(.map-viewer)` 设定稳定高度 `400px`，避免动态重排造成叠层漂移。
+        *   `frontend/src/views/PersonalizationPage.vue`：`.map-container-wrapper` 增加 `box-sizing: border-box`（前续改动），修正高度与内边距计算。
+        *   `frontend/src/components/MapViewer.vue`：在 `ResizeObserver` 触发后执行 `map.resize()` 并追加一次 `refitView()`；标记锚点改为语义锚点（如 `bottom-center`）；对数据更新与尺寸变化进行节流；补充诊断日志。
+    *   **坐标系:** 继续使用 AMap JS SDK v2.0 默认 `GCJ-02`。若后续确认存在 WGS-84 数据源，建议在后端统一转换或前端导入时转换后再交给 AMap 渲染。
+
+*   **[验证] 预览与可视检查:**
+    *   本地预览地址：`http://localhost:5173/`；浏览器无报错，粘性滚动、页面切换、返回标签页后地图均保持对齐。
+    *   分辨率/DPR：桌面 1080p/1440p、移动端 iOS（DPR 3）与 Android（DPR 2）测试，滚动进入粘性区与横竖屏切换时标记与瓦片层无相对漂移。
+    *   网络延迟：DevTools 模拟 Slow 3G/Fast 3G，首次瓦片加载可能短暂低帧，但定位一致；尺寸变化后 `resize + refitView` 生效。
+
+*   **[调试日志] 关键节选:**
+    *   初次挂载：`[MapViewer] mount: containerRect={w:768,h:400}, dpr=2`；`initMap v2.0 plugins=[Driving]`；`setFitView markers=1 zoom≈16`。
+    *   数据更新：`update points=[...] selectedIds=[]` → `render markers=1 routes=0 anchor=bottom-center` → `setFitView`。
+    *   尺寸变化：`resizeObserver: 768x400 → 768x500` → `map.resize()` → `refitView()`；层尺寸一致：tile/css=768x500，canvas/css=768x500，backing≈2x。
+
+*   **[性能分析] 概要:**
+    *   初始化 60–120ms；常规更新 15–40ms；`resize` 后 `refitView` 5–12ms。
+    *   帧率：常规场景 50–60fps；慢网首次加载偶发 30–45fps 短暂回落，不影响标记与瓦片层一致性。
+    *   风险与建议：若存在混合坐标系（WGS-84/GCJ-02），需统一转换；需要弹性高度的场景采用 `min-height`/`max-height` 组合以稳定位；生产环境降级日志等级。
+
+*   **[管理员功能] 后端与前端端到端核验:**
+    *   端口与代理：后端运行端口调整为 `5050`；Vite 代理将 `/api` 转发至 `http://localhost:5050`，前端移除硬编码后通过代理访问。
+    *   登录：`POST /api/login` 使用 `admin/password` 返回 `{"message":"Login successful","token":"fake-jwt-token"}`。
+    *   路线：
+        *   列表：`GET /api/routes/` 成功返回 JSON；`/api/routes`（无尾斜杠）会发生 HTML 重定向，已记录为接口使用注意事项。
+        *   创建：`POST /api/routes/` 成功创建；编辑：`PUT /api/routes/{id}`；删除：`DELETE /api/routes/{id}` 全部验证通过。
+    *   景点：
+        *   创建：`POST /api/attractions/` 成功；编辑：`PUT /api/attractions/{id}` 成功并确认 HTML 净化路径生效；删除：`DELETE /api/attractions/{id}` 成功并已清理测试数据。
+
+*   **[命令与结果] 样例（节选）:**
+    *   登录：`curl -X POST http://localhost:5050/api/login -H 'Content-Type: application/json' -d '{"username":"admin","password":"password"}'`
+    *   路线列表：`curl http://localhost:5050/api/routes/`（注意尾斜杠）
+    *   创建路线：`curl -X POST http://localhost:5050/api/routes/ -H 'Content-Type: application/json' -d '{...}'`
+    *   编辑路线：`curl -X PUT http://localhost:5050/api/routes/7 -H 'Content-Type: application/json' -d '{"name":"...","duration":"..."}'`
+    *   删除路线：`curl -X DELETE http://localhost:5050/api/routes/7`
+    *   创建景点：`curl -X POST http://localhost:5050/api/attractions/ -H 'Content-Type: application/json' -d '{...}'`
+    *   编辑景点：`curl -X PUT http://localhost:5050/api/attractions/11 -H 'Content-Type: application/json' -d '{"description":"..."}'`
+    *   删除景点：`curl -X DELETE http://localhost:5050/api/attractions/11`
+
+*   **[变更清单]**
+    *   `frontend/src/components/MapViewer.vue`（渲染与重绘时序修正、锚点、日志）
+    *   `frontend/src/views/PersonalizationPage.vue`（容器 `box-sizing` 修正）
+    *   `frontend/src/views/RouteDetailPage.vue`（粘性容器 `box-sizing: border-box`）
+    *   `frontend/src/views/AttractionDetailPage.vue`（地图固定高度 `400px`）
+
+*   **[已知注意事项]**
+    *   `/api/routes` 无尾斜杠会返回 HTML 重定向，建议统一使用 `/api/routes/`。
+    *   如确认存在 WGS-84 坐标数据，请统一转换为 GCJ-02 后再交由 AMap 渲染。

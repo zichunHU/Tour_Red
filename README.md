@@ -92,6 +92,8 @@
         ```
     -   前端应用将在终端所示的地址（通常是 `http://localhost:5173`）上可用。
 
+    -   说明：开发模式下已配置 Vite 代理，前端只需请求相对路径 `/api/...`，由 `vite.config.js` 代理到后端。
+
 # 项目架构概述
 
 本文档旨在详细介绍 "Tour" 项目的整体架构，帮助新成员快速理解项目结构、技术选型和数据流程，以便于后续的开发和维护。
@@ -204,6 +206,46 @@ Tour/
     -   `AttractionListPage.vue` 接收到包含景点数据的 JSON 响应。
     -   组件将数据保存到其内部状态中。
     -   Vue 的响应式系统自动更新 DOM，将景点列表渲染到页面上。
+
+## 个性化定制与结果页
+
+-   **流程**：在 `PersonalizationPage.vue` 中，用户通过“兴趣选择 → 景点选择 → 生成路线”三步完成个性化路线的创建。
+-   **生成接口**：前端调用后端 `POST /api/routes/generate`，基于最近邻算法与地理距离计算生成推荐顺序。
+-   **结果展示**：
+    -   使用时间轴（Timeline）风格的卡片列表，清晰展示每一站的顺序与关键信息。
+    -   列表中显示相邻站点的“分段里程”，底部显示“总里程”。
+    -   集成 `MapViewer.vue`，在地图上绘制完整路线与标记。
+    -   在地图加载阶段展示提示，弱网/首次加载时更具可理解性。
+
+## 地图密钥配置（高德 AMap）
+
+-   **前端 JS API（Web 端）**：
+    -   在 `frontend/index.html` 配置高德 JS SDK：
+      ```html
+      <script src="https://webapi.amap.com/maps?v=2.0&key=8ad4201c7e53e40ab43d69fca03a83d5&plugin=AMap.Driving"></script>
+      <script>
+        window._AMapSecurityConfig = { securityJsCode: '9882b47f92bd4392bee32d82221eb246' };
+      </script>
+      ```
+    -   Key 类型需为“Web端 JS API”，并与 `securityJsCode` 一一对应。
+    -   在高德控制台配置域名白名单，至少包含 `localhost` 与 `127.0.0.1`（开发），以及生产域名。
+
+-   **后端 Web 服务 API（Web 服务）**：
+    -   用于地理编码等服务，建议以环境变量方式配置（示例变量名：`AMAP_SERVICE_KEY`）。
+    -   当前测试 Key：`aeaae00007b40fff8508b130084a22e6`。
+
+-   **故障排查**：
+    -   `net::ERR_ABORTED`：常见原因包括 Key/安全码不匹配、域名未在白名单、插件未加载、浏览器扩展拦截请求。
+    -   插件缺失：路线规划需 `AMap.Driving` 插件；请确认 `index.html` 加载了对应插件。
+    -   浏览器/网络：禁用影响网络的扩展，或更换网络环境重试。
+
+-   **建议的密钥管理**：
+    -   后续可将前端密钥迁移至 `.env` 并在构建时注入，以减少硬编码与泄露风险；当前实现基于 `index.html` 显式配置以保证可用性。
+
+## 已知问题与说明
+
+-   首页轮播在 `Swiper.js` 的 `loop: true` 且配合小数 `slidesPerView` 时，会触发第三方库内部布局 Bug；当前已改为整数展示，问题已规避。
+-   地图不可用场景（SDK 被阻止或网络异常）时，`MapViewer.vue` 会显示“地图暂不可用：请检查高德 Key 或网络”的提示，提高可用性与可理解性。
 
 
 ## 待办事项 (TODO)

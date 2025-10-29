@@ -6,6 +6,33 @@ import TagChip from '../components/TagChip.vue';
 import LoadingSkeleton from '../components/LoadingSkeleton.vue';
 import Toast from '../components/Toast.vue';
 
+// --- DISTANCE UTILS & RESULT METRICS ---
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+const routeSegments = computed(() => {
+  if (!generatedRoute.value || !generatedRoute.value.attractions) return [];
+  const attrs = generatedRoute.value.attractions;
+  return attrs.map((attr, idx) => {
+    let distanceFromPrevKm = null;
+    if (idx > 0 && attr.location && attrs[idx - 1].location) {
+      const prev = attrs[idx - 1].location;
+      const cur = attr.location;
+      distanceFromPrevKm = haversineKm(prev.latitude, prev.longitude, cur.latitude, cur.longitude);
+    }
+    return { index: idx, attraction: attr, distanceFromPrevKm };
+  });
+});
+
+const totalDistanceKm = computed(() => routeSegments.value.reduce((sum, s) => sum + (s.distanceFromPrevKm || 0), 0));
+
 // --- STATE MANAGEMENT ---
 
 // Overall step control: 'selection' or 'results'
@@ -160,21 +187,26 @@ function startOver() {
 
     <!-- Step 2: Results Phase -->
     <section v-if="step === 'results' && generatedRoute">
-       <div class="results-grid">
+      <div class="results-grid">
         <div class="route-list-container">
           <h4>推荐路线顺序</h4>
+          <div class="route-summary" v-if="totalDistanceKm">
+            总里程约：{{ totalDistanceKm.toFixed(1) }} 公里
+          </div>
           <ol class="route-list">
-            <li v-for="(attraction, index) in generatedRoute.attractions" :key="attraction.id">
-              <span class="route-order">{{ index + 1 }}</span>
+            <li v-for="segment in routeSegments" :key="segment.attraction.id" class="timeline-item">
+              <span class="bullet">{{ segment.index + 1 }}</span>
               <div class="route-attraction-info">
-                <h5>{{ attraction.name }}</h5>
-                <p>{{ attraction.address }}</p>
+                <h5>{{ segment.attraction.name }}</h5>
+                <p class="address">{{ segment.attraction.address }}</p>
+                <p v-if="segment.index > 0 && segment.distanceFromPrevKm" class="distance">距离上一个点 ≈ {{ segment.distanceFromPrevKm.toFixed(1) }} 公里</p>
               </div>
             </li>
           </ol>
         </div>
         <div class="map-container-wrapper">
           <MapViewer :waypoints="generatedRoute.attractions" />
+          <div class="map-hint">若地图未显示，请检查高德 Key 与安全码或网络状态</div>
         </div>
       </div>
 
@@ -350,6 +382,36 @@ function startOver() {
   text-align: center;
   margin-bottom: 2rem;
 }
+.route-list { list-style: none; padding: 0; margin: 0; }
+.timeline-item { display: grid; grid-template-columns: 36px 1fr; gap: 1rem; padding: 0.75rem 0; }
+.timeline-item + .timeline-item { border-top: 1px dashed var(--border-color); }
+.bullet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.route-attraction-info h5 { margin: 0; font-size: 1rem; font-weight: 700; }
+.route-attraction-info .address { margin: 0.25rem 0 0 0; color: var(--secondary-text-color); }
+.route-attraction-info .distance { margin: 0.25rem 0 0 0; color: var(--secondary-text-color); font-size: 0.85rem; }
+
+.route-summary {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.map-hint { margin-top: 0.5rem; color: var(--secondary-text-color); font-size: 0.85rem; }
 .tag-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 .attraction-list li { cursor: pointer; }

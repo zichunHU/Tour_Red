@@ -1,5 +1,6 @@
 <template>
   <div ref="mapContainer" class="map-viewer"></div>
+  <div v-if="!amapLoaded" class="map-fallback">地图暂不可用：请检查高德 Key 或网络</div>
 </template>
 
 <script setup>
@@ -25,6 +26,7 @@ const props = defineProps({
 const emit = defineEmits(['marker-click']);
 
 const mapContainer = ref(null);
+const amapLoaded = ref(false);
 let map = null; // To hold the map instance
 const markers = []; // To keep track of added markers
 
@@ -45,8 +47,10 @@ watch(() => [props.latitude, props.longitude, props.waypoints], () => {
 const initMap = () => {
   if (typeof AMap === 'undefined') {
     console.error('AMap SDK is not loaded.');
+    amapLoaded.value = false;
     return;
   }
+  amapLoaded.value = true;
   map = new AMap.Map(mapContainer.value, {
     zoom: 11, // Adjusted default zoom
     viewMode: '3D',
@@ -130,5 +134,10 @@ watch([points, () => props.selectedIds], () => {
   width: 100%;
   height: 400px; /* Default height, can be overridden by parent */
   border-radius: var(--card-border-radius);
+}
+.map-fallback {
+  margin-top: 0.5rem;
+  color: var(--secondary-text-color);
+  font-size: 0.85rem;
 }
 </style>

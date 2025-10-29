@@ -123,6 +123,12 @@ function startOver() {
   error.value = null; // Clear previous errors
 }
 
+// --- Locale-aware bilingual titles ---
+const { locale } = useI18n()
+const isEn = computed(() => locale.value === 'en-US')
+const getPrimaryTitle = (a) => (isEn.value ? (a.name_en || a.name) : a.name)
+const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
+
 </script>
 
 <style scoped>
@@ -282,9 +288,10 @@ function startOver() {
 
 .selection-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 3fr 2fr;
   gap: 2rem;
-  min-height: 600px;
+  align-items: start;
+  min-height: 80vh;
 }
 
 .attraction-list-container {
@@ -293,40 +300,41 @@ function startOver() {
   border-radius: var(--card-border-radius);
   box-shadow: var(--card-shadow);
   overflow-y: auto;
-  max-height: 600px;
+  height: 80vh;
 }
+
 
 .attraction-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
 .attraction-list li {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 0;
+  border-bottom: none;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.attraction-list li:last-child {
-  border-bottom: none;
-}
+.attraction-list li:last-child { border-bottom: none; }
 
-.attraction-list li:hover {
-  background-color: var(--background-color);
-}
+.attraction-list li:hover { background-color: transparent; }
 
 .attraction-list li.selected {
-  background-color: #e3f2fd;
-  border-left: 4px solid var(--accent-color);
-  padding-left: calc(1rem - 4px);
+  background: transparent;
+  border-left: none;
+  padding-left: 0;
 }
 
 .attraction-list h5 {
   margin: 0 0 0.25rem 0;
   font-size: 1rem;
   font-weight: 600;
+  word-break: break-word;
 }
 
 .attraction-list p {
@@ -340,7 +348,11 @@ function startOver() {
   background-color: var(--card-background-color);
   border-radius: var(--card-border-radius);
   box-shadow: var(--card-shadow);
-  padding: 1rem;
+  padding: 0.75rem;
+  height: 80vh;
+  position: sticky;
+  top: 1rem;
+  overflow: hidden;
 }
 
 .map-overlay {
@@ -432,14 +444,15 @@ function startOver() {
   background: var(--card-background-color);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.75rem;
   transition: border-color 150ms ease, background 150ms ease;
 }
 .attraction-list .card:hover { background: var(--background-color); }
 .attraction-list .card-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
 }
 .area-tag {
   font-size: 0.8rem;
@@ -447,6 +460,7 @@ function startOver() {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.15rem 0.5rem;
+  margin-top: 0.25rem;
 }
 .attraction-list li.selected .card { border-color: var(--accent-color); }
 
@@ -457,9 +471,24 @@ function startOver() {
   border-top: 1px solid var(--border-color);
   padding-top: 1rem;
 }
+
+@media (max-width: 1024px) {
+  .selection-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    min-height: auto;
+  }
+  .attraction-list-container {
+    height: auto;
+  }
+  .attraction-list {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .map-container-wrapper {
+    position: relative;
+    top: auto;
+    height: 60vh;
+  }
+}
 </style>
-// Locale-aware bilingual titles
-const { locale } = useI18n()
-const isEn = computed(() => locale.value === 'en-US')
-const getPrimaryTitle = (a) => (isEn.value ? (a.name_en || a.name) : a.name)
-const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')

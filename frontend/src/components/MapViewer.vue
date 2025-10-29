@@ -4,7 +4,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, onUnmounted } from 'vue';
 
 const props = defineProps({
   latitude: Number,
@@ -29,6 +29,7 @@ const mapContainer = ref(null);
 const amapLoaded = ref(false);
 let map = null; // To hold the map instance
 const markers = []; // To keep track of added markers
+let resizeObserver = null; // Observe container size changes
 
 // A reactive ref to hold a normalized list of points
 const points = ref([]);
@@ -57,6 +58,15 @@ const initMap = () => {
     center: [121.4737, 31.2304] // Center on Shanghai
   });
   updateMap(points.value);
+  // Ensure map reflows when container size changes
+  if (mapContainer.value && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      if (map) {
+        map.resize();
+      }
+    });
+    resizeObserver.observe(mapContainer.value);
+  }
 };
 
 const updateMap = (currentPoints) => {
@@ -119,6 +129,17 @@ const updateMap = (currentPoints) => {
 
 onMounted(() => {
   setTimeout(initMap, 150);
+  // Fallback: resize on window size changes
+  const onWindowResize = () => { if (map) map.resize(); };
+  window.addEventListener('resize', onWindowResize);
+  // Cleanup on unmount
+  onUnmounted(() => {
+    window.removeEventListener('resize', onWindowResize);
+    if (resizeObserver && mapContainer.value) {
+      try { resizeObserver.unobserve(mapContainer.value); } catch {}
+      resizeObserver = null;
+    }
+  });
 });
 
 // Watch for changes in points or selectedIds to update the map
@@ -132,7 +153,8 @@ watch([points, () => props.selectedIds], () => {
 <style scoped>
 .map-viewer {
   width: 100%;
-  height: 400px; /* Default height, can be overridden by parent */
+  height: 100%; /* Fill parent container height */
+  min-height: 360px; /* Sensible minimum to avoid collapse */
   border-radius: var(--card-border-radius);
 }
 .map-fallback {

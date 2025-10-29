@@ -68,14 +68,15 @@ onMounted(async () => {
 
 // --- COMPUTED PROPERTIES ---
 
-// Filter attractions based on selected tags
+// Filter attractions based on selected tags (UNION: show items that match any selected tag)
 const filteredAttractions = computed(() => {
   if (selectedTags.value.length === 0) {
     return allAttractions.value;
   }
-  return allAttractions.value.filter(attraction => 
-    selectedTags.value.every(tag => attraction.theme && attraction.theme.includes(tag))
-  );
+  return allAttractions.value.filter(attraction => {
+    const themes = Array.isArray(attraction.theme) ? attraction.theme : []
+    return selectedTags.value.some(tag => themes.includes(tag))
+  })
 });
 
 // Convert selected attraction IDs from the Set to an array for the template

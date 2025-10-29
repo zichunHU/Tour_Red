@@ -133,7 +133,14 @@
     "loading": "Loading map...",
     "loadError": "Map temporarily unavailable: Please check Gaode Key or network",
     "noLocation": "No location information available",
-    "location": "Location"
+    "location": "Location",
+    "directions": "Directions",
+    "getMyLocation": "Get My Location",
+    "openInAMap": "Open in AMap",
+    "openInAppleMaps": "Open in Apple Maps",
+    "copyAddress": "Copy Address",
+    "distanceFromYou": "About {km} km from you",
+    "walkingTimeApprox": "Walking ~{minutes} min"
   },
   "messages": {
     "success": "Operation successful",

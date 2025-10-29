@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import MapViewer from '../components/MapViewer.vue' // 导入地图组件
+import GuideCard from '../components/GuideCard.vue'
 import { THEME_ICONS } from '../constants/themeIcons.js'
 
 const route = useRoute()
@@ -198,6 +199,14 @@ const goBack = () => {
             <div v-else class="no-location">
               {{ $t('map.noLocation') }}
             </div>
+
+            <GuideCard
+              v-if="attraction.location && attraction.location.latitude && attraction.location.longitude"
+              :latitude="attraction.location.latitude"
+              :longitude="attraction.location.longitude"
+              :address="primaryAddress"
+              :name="primaryTitle"
+            />
           </aside>
         </div>
       </section>

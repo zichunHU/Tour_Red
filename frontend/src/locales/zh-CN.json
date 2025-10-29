@@ -144,7 +144,14 @@
     "loading": "地图加载中...",
     "loadError": "地图暂不可用：请检查高德 Key 或网络",
     "noLocation": "暂无位置信息",
-    "location": "位置信息"
+    "location": "位置信息",
+    "directions": "指路卡",
+    "getMyLocation": "获取我的位置",
+    "openInAMap": "在高德地图打开",
+    "openInAppleMaps": "在Apple地图打开",
+    "copyAddress": "复制地址",
+    "distanceFromYou": "距离您约 {km} 公里",
+    "walkingTimeApprox": "步行约 {minutes} 分钟"
   },
   "messages": {
     "success": "操作成功",

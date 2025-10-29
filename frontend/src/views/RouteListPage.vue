@@ -1,10 +1,40 @@
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { THEME_ICONS } from '../constants/themeIcons.js'
+import { resolveThemeTag, resolveDurationTag, isDurationCode } from '../utils/themeTag.js'
 
 const routes = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+const { locale, t } = useI18n()
+const isEn = computed(() => locale.value === 'en-US')
+
+const stripHtml = (s) => (s || '').replace(/<[^>]*>/g, '')
+const truncate = (s, n) => {
+  if (!s) return ''
+  return s.length > n ? s.slice(0, n) + '…' : s
+}
+const getPrimaryTitle = (r) => (isEn.value ? (r.name_en || r.name) : (r.name || r.name_en || ''))
+const getSecondaryTitle = (r) => (isEn.value ? (r.name || '') : (r.name_en || ''))
+const getSummary = (r) => {
+  const raw = isEn.value
+    ? (r.summary_en || r.summary || r.description_en || r.description)
+    : (r.summary || r.summary_en || r.description || r.description_en)
+  return truncate(stripHtml(raw), 100)
+}
+
+const getThemeOnlyTag = (code) => {
+  if (!code || isDurationCode(code)) return { icon: '', label: '' }
+  return resolveThemeTag(code, t, THEME_ICONS)
+}
+
+const getDurationTag = (route) => {
+  const durCode = route.duration || (isDurationCode(route.theme) ? route.theme : '')
+  return resolveDurationTag(durCode, t)
+}
 
 onMounted(async () => {
   try {
@@ -24,8 +54,8 @@ onMounted(async () => {
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h2>{{ $t('routes.title') }}</h2>
-      <p>{{ $t('home.subtitle') }}</p>
+      <h2>{{ t('routes.title') }}</h2>
+      <p>{{ t('home.subtitle') }}</p>
     </header>
 
     <div v-if="loading">{{ $t('common.loading') }}</div>
@@ -34,9 +64,17 @@ onMounted(async () => {
     <section v-if="!loading && !error" class="routes-list">
       <router-link v-for="route in routes" :key="route.id" :to="'/routes/' + route.id" class="card-link">
         <div class="card">
-          <h3>{{ route.name }}</h3>
-          <p class="description">{{ route.description }}</p>
-          <small class="theme-tag">{{ route.theme }}</small>
+          <h3 :class="{ 'title-accent': isEn }">{{ getPrimaryTitle(route) }}</h3>
+          <p v-if="getSecondaryTitle(route)" class="name-secondary">{{ getSecondaryTitle(route) }}</p>
+          <p class="description">{{ getSummary(route) }}</p>
+          <div class="tag-row">
+            <small v-if="getThemeOnlyTag(route.theme).label" class="theme-tag">
+              <template v-if="getThemeOnlyTag(route.theme).icon">{{ getThemeOnlyTag(route.theme).icon }} </template>{{ getThemeOnlyTag(route.theme).label }}
+            </small>
+            <small v-if="getDurationTag(route).label" class="duration-tag">
+              <template v-if="getDurationTag(route).icon">{{ getDurationTag(route).icon }} </template>{{ getDurationTag(route).label }}
+            </small>
+          </div>
         </div>
       </router-link>
     </section>
@@ -105,6 +143,16 @@ onMounted(async () => {
   padding: 0.25rem 0.75rem;
   background-color: #e5e5ea;
   color: #3c3c43;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.tag-row { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; }
+.duration-tag {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  background-color: #eef6ff;
+  color: #1e3a8a;
   border-radius: 8px;
   font-weight: 500;
 }

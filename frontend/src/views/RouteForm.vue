@@ -3,6 +3,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { THEME_KEYS } from '../constants/catalog.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,7 +12,9 @@ const { t } = useI18n()
 const tourRoute = ref({
   name: '',
   description: '',
-  attraction_ids: []
+  attraction_ids: [],
+  theme: '',
+  duration: ''
 })
 
 const loading = ref(false)
@@ -97,6 +100,24 @@ const handleSubmit = async () => {
         <label for="description">{{ t('routes.routeDescription') }}</label>
         <textarea id="description" v-model="tourRoute.description" rows="5"></textarea>
       </div>
+
+      <div class="form-group">
+        <label for="theme">{{ t('routes.theme') }}</label>
+        <select id="theme" v-model="tourRoute.theme">
+          <option value="">{{ t('common.none') }}</option>
+          <option v-for="code in THEME_KEYS" :key="code" :value="code">{{ t(`themes.${code}`) }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="duration">{{ t('routes.duration') }}</label>
+        <select id="duration" v-model="tourRoute.duration">
+          <option value="">{{ t('common.none') }}</option>
+          <option value="半日游">{{ t('routes.halfDay') }}</option>
+          <option value="一日游">{{ t('routes.oneDay') }}</option>
+          <option value="多日游">{{ t('routes.multiDay') }}</option>
+        </select>
+      </div>
       <div class="form-group">
         <label for="attraction_ids">{{ t('routes.attractionIdsLabel') }}</label>
         <input id="attraction_ids" :value="tourRoute.attraction_ids.join(', ')" @input="tourRoute.attraction_ids = $event.target.value.split(',').map(t => t.trim())" type="text">
@@ -135,6 +156,15 @@ const handleSubmit = async () => {
 
 .form-group input,
 .form-group textarea {
+  font-family: var(--system-font);
+  font-size: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background-color: var(--background-color);
+}
+
+.form-group select {
   font-family: var(--system-font);
   font-size: 1rem;
   padding: 0.75rem;

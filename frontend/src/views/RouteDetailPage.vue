@@ -2,6 +2,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { resolveThemeTag, resolveDurationTag, isDurationCode } from '../utils/themeTag.js'
 import { useRoute, useRouter } from 'vue-router'
 import MapViewer from '../components/MapViewer.vue'
 import { THEME_ICONS } from '../constants/themeIcons.js'
@@ -12,7 +13,7 @@ const router = useRouter()
 const routeData = ref(null)
 const loading = ref(true)
 const error = ref(null)
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const stripHtml = (s) => (s || '').replace(/<[^>]*>/g, '')
 const truncate = (s, n) => {
@@ -68,6 +69,34 @@ const goBack = () => {
 const isEn = computed(() => locale.value === 'en-US')
 const getPrimaryTitle = (a) => (isEn.value ? (a.name_en || a.name) : a.name)
 const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
+
+// Locale-aware bilingual titles and description for the route itself
+const primaryRouteTitle = computed(() => {
+  if (!routeData.value) return ''
+  const r = routeData.value
+  return isEn.value ? (r.name_en || r.name || '') : (r.name || r.name_en || '')
+})
+const secondaryRouteTitle = computed(() => {
+  if (!routeData.value) return ''
+  const r = routeData.value
+  return isEn.value ? (r.name || '') : (r.name_en || '')
+})
+const routeDescriptionHtml = computed(() => {
+  if (!routeData.value) return ''
+  const r = routeData.value
+  return isEn.value ? (r.description_en || '') : (r.description || '')
+})
+
+// Resolve split tags: theme (skip if duration), duration (from field or fallback)
+const themeTag = computed(() => {
+  const code = routeData.value?.theme || ''
+  if (!code || isDurationCode(code)) return { icon: '', label: '' }
+  return resolveThemeTag(code, t, THEME_ICONS)
+})
+const durationTag = computed(() => {
+  const durCode = routeData.value?.duration || (isDurationCode(routeData.value?.theme) ? routeData.value?.theme : '')
+  return resolveDurationTag(durCode, t)
+})
 </script>
 
 <template>
@@ -78,9 +107,16 @@ const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
     <article v-if="routeData" class="detail-card">
       <header class="detail-header">
         <button @click="goBack" class="back-button">&larr; {{ $t('common.back') }}</button>
-        <h1>{{ routeData.name }}</h1>
-        <p class="name-en">{{ routeData.name_en }}</p>
-        <span class="tag theme-tag">{{ THEME_ICONS[routeData.theme] }} {{ $t(`themes.${routeData.theme}`) }}</span>
+        <h1>{{ primaryRouteTitle }}</h1>
+        <p v-if="secondaryRouteTitle" class="name-en">{{ secondaryRouteTitle }}</p>
+        <div class="header-tags">
+          <span v-if="themeTag.label" class="tag theme-tag">
+            <template v-if="themeTag.icon">{{ themeTag.icon }} </template>{{ themeTag.label }}
+          </span>
+          <span v-if="durationTag.label" class="tag duration-tag">
+            <template v-if="durationTag.icon">{{ durationTag.icon }} </template>{{ durationTag.label }}
+          </span>
+        </div>
       </header>
 
       <div class="main-content-grid">
@@ -88,7 +124,8 @@ const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
           <section class="detail-content">
             <div class="description">
               <h3>{{ $t('routes.routeDescription') }}</h3>
-              <p>{{ routeData.description }}</p>
+              <div v-if="routeDescriptionHtml" v-html="routeDescriptionHtml" class="markdown-content"></div>
+              <p v-else class="no-description">{{ $t('messages.dataNotFound') }}</p>
             </div>
 
             <div class="attractions-section">
@@ -213,6 +250,11 @@ const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
   background-color: #e5e5ea;
   color: #3c3c43;
 }
+.duration-tag {
+  background-color: #eef6ff;
+  color: #1e3a8a;
+}
+.header-tags { display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem; }
 
 .description h3, .attractions-section h3 {
   font-size: 1.2rem;
@@ -227,6 +269,17 @@ const getSecondaryTitle = (a) => (isEn.value ? (a.name || '') : '')
 .description p {
   line-height: 1.7;
   color: var(--secondary-text-color);
+}
+
+.markdown-content ::v-deep(p) {
+  line-height: 1.7;
+  color: var(--secondary-text-color);
+  margin: 1em 0;
+}
+
+.no-description {
+  color: var(--secondary-text-color);
+  font-size: 0.95rem;
 }
 
 .attractions-container {

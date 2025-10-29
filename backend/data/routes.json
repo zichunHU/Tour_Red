@@ -6,6 +6,7 @@
     "description": "本路线串联了中国共产党诞生的核心地点与重要人物的故居，带您回顾建党初期的峥嵘岁月。",
     "description_en": "This route connects the core site of the birth of the CPC and the former residences of important figures, taking you back to the momentous years of the Party's founding.",
     "theme": "一日游",
+    "duration": "一日游",
     "attraction_ids": [
       1,
       3,
@@ -19,6 +20,7 @@
     "description": "从龙华烈士陵园到一大会址，本路线旨在缅怀为革命事业英勇献身的先烈们，感受今日幸福生活的来之不易。",
     "description_en": "From Longhua Martyrs' Cemetery to the site of the First National Congress, this route aims to commemorate the martyrs who sacrificed their lives for the revolution and to appreciate the hard-won happiness of today.",
     "theme": "半日游",
+    "duration": "半日游",
     "attraction_ids": [
       2,
       1
@@ -30,6 +32,7 @@
     "description": "本路线带您领略上海最具代表性的两个景点：外滩的万国建筑博览群和豫园的古典园林之美。",
     "description_en": "This route shows you two of the most representative attractions in Shanghai: the exotic building clusters on the Bund and the beauty of classical gardens in Yu Garden.",
     "theme": "一日游",
+    "duration": "一日游",
     "attraction_ids": [
       4,
       5
@@ -42,6 +45,7 @@
     "description": "从党的诞生地出发，漫步至外滩，感受上海的红色历史与现代都市的交融。",
     "description_en": "Starting from the birthplace of the Party and strolling to the Bund, experience the blend of Shanghai's red history and modern metropolis.",
     "theme": "半日游",
+    "duration": "半日游",
     "attraction_ids": [
       1,
       4
@@ -55,6 +59,7 @@
     "description": "本路线从党的诞生地出发，串联起中国工人运动的重要地标，解码上海作为革命发源地的红色基因。",
     "description_en": "Starting from the birthplace of the Party, this route connects important landmarks of the Chinese workers' movement, decoding the red gene of Shanghai as a revolutionary cradle.",
     "theme": "半日游",
+    "duration": "半日游",
     "attraction_ids": [
       1,
       6,
@@ -68,6 +73,7 @@
     "description": "本路线聚焦于法租界内的几个关键地点，展示马克思主义如何在上海完成“理论→出版→组织”的完整传播链条。",
     "description_en": "Focusing on several key locations within the former French Concession, this route showcases how Marxism completed the entire chain of \"Theory -> Publication -> Organization\" in Shanghai.",
     "theme": "半日游",
+    "duration": "半日游",
     "attraction_ids": [
       8,
       9,

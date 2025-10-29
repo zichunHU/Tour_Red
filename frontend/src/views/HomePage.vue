@@ -69,6 +69,18 @@ const truncate = (text, length) => {
   return text.length > length ? text.substring(0, length) + '…' : text;
 }
 
+// --- ROUTE CARD LOCALIZATION HELPERS ---
+// Bilingual title and summary with graceful fallback
+const getRoutePrimaryTitle = (r) => (isEn.value ? (r.name_en || r.name) : (r.name || r.name_en || ''))
+const getRouteSecondaryTitle = (r) => (isEn.value ? (r.name || '') : (r.name_en || ''))
+const getRouteSummary = (r) => {
+  const raw = isEn.value
+    ? (r.summary_en || r.summary || r.description_en || r.description)
+    : (r.summary || r.summary_en || r.description || r.description_en)
+  const clean = stripHtml(raw)
+  return truncate(clean, 100)
+}
+
 // --- COMPUTED PROPERTIES ---
 
 const heroSlides = computed(() => attractions.value.filter(a => a.image_url).slice(0, 5));
@@ -191,8 +203,9 @@ function exploreTheme(themeCode) {
              <router-link :to="'/routes/' + route.id" class="route-card-link">
               <div class="route-card">
                 <div class="route-card-content">
-                  <h3 class="route-card-title">{{ route.name }}</h3>
-                  <p class="route-card-description">{{ route.description }}</p>
+                  <h3 class="route-card-title" :class="{ 'title-accent': isEn }">{{ getRoutePrimaryTitle(route) }}</h3>
+                  <p v-if="getRouteSecondaryTitle(route)" class="name-secondary">{{ getRouteSecondaryTitle(route) }}</p>
+                  <p class="route-card-description">{{ getRouteSummary(route) }}</p>
                   <span class="route-card-tag">{{ $t('routes.includesAttractionCount', { count: route.attraction_ids.length }) }}</span>
                 </div>
               </div>

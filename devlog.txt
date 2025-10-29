@@ -478,3 +478,79 @@
     *   切换中英文分别检查首页与路线详情页：标题渲染与颜色符合预期；浏览器无错误，终端仅见 Dart Sass 旧 API 弃用提醒。
 
 *   **结果:** 首页与路线详情页标题双语显示稳定，主题色统一、风格一致；构建与 HMR 工作正常。
+\n+## [2025-10-29] 个性化页面与地图显示优化记录
+
+**背景:** 用户反馈“Personalized Recommendations”页面在英文模式下卡片拥挤、地图尺寸与卡片色块不匹配，且小屏幕下 AMap `canvas` 与父容器 `div` 尺寸不一致。
+
+**前端（UI/UX）改动:**
+1. PersonalizationPage 布局与地图容器
+   - 将选择栅格比例从 `2fr:1fr` 调整为 `3fr:2fr`，增大右侧地图区域；最小高度由 `70vh` 调整为 `80vh`，随后将地图容器高度提升为 `85vh`。
+   - 地图容器 `map-container-wrapper` 保持 `position: sticky; top: 1rem; overflow: hidden;`；将内边距由 `1rem` 减至 `0.75rem`，有效增大可见地图面积。
+   - 响应式断点（`max-width: 1024px`）下将地图高度由 `50vh` 提升至 `60vh`，确保小屏上下堆叠时仍有充足可视面积。
+
+2. 景点列表卡片可读性
+   - 将 `.attraction-list` 改为自适应网格：`repeat(auto-fill, minmax(300px, 1fr))`，并增加 `gap: 1rem`；移除列表项的行分隔线与额外内边距，悬停背景改为透明，选中态改为卡片边框高亮，整体更简洁。
+   - 将 `.card-header` 改为竖向堆叠（`flex-direction: column`），并增加元素间距，避免英文标题与标签拥挤；为标题增加 `word-break: break-word`；为 `.area-tag` 增加顶部间距。
+
+3. 地图组件尺寸与重算
+   - `MapViewer.vue` 中将 `.map-viewer` 高度由固定 `400px` 改为 `height: 100%`，并设定 `min-height: 360px` 以防塌缩，确保地图填满父容器色块。
+   - 新增 `ResizeObserver` 监听容器尺寸变化，并在回调中调用 `map.resize()`；同时绑定 `window.resize` 事件作为兜底，解决小屏模式下 `canvas` 与容器尺寸不一致的问题。
+
+**验证:**
+- 本地开发预览无浏览器错误；桌面端地图填满卡片色块、大小匹配；小屏断点下地图随容器变化即时重算；英文模式下卡片标题与标签分行显示，拥挤显著缓解。
+
+**后续建议:** 如需继续增大地图，可将桌面高度调至 `90vh`，小屏高度提升至 `65–70vh`；或将容器内边距进一步降至 `0.5rem` 以获得更多绘图空间。
+\n+**日期:** 2025年10月29日
+**阶段:** 国际化改造（三）路线详情页双语
+
+*   **[改造] 路线详情页双语显示:**
+    *   文件：`frontend/src/views/RouteDetailPage.vue`
+    *   标题：新增 `primaryRouteTitle`/`secondaryRouteTitle` 计算属性，英文优先、缺失回退中文，次级行展示另一语言名称。
+    *   描述：新增 `routeDescriptionHtml`，按当前语言（`description_en` 或 `description`）渲染 markdown；无内容时显示 `$t('messages.dataNotFound')` 占位。
+    *   样式：补充 `.markdown-content` 与 `.no-description` 文本样式，保持与景点详情页一致的阅读体验。
+    *   验证：本地预览语言切换后，标题与描述正确切换；英文缺失时回退中文；版式稳定、无浏览器错误。
+2025-10-29 — Fix bilingual language on route cards (Home & List)
+- Context: User reported “Tourism Routes” and “Featured Routes” cards showing incorrect language.
+- HomePage.vue
+  - Added locale-aware helpers for routes: getRoutePrimaryTitle, getRouteSecondaryTitle, getRouteSummary.
+  - Primary title: English preferred, fallback to Chinese; accent color applied in EN locale.
+  - Secondary title: Shows the other language when available (EN shows CN, CN shows EN) for clarity.
+  - Summary: Fallback order summary_en → summary → description_en → description; strip HTML and truncate to 100 chars.
+  - Kept includes-attraction count tag; theme card section unchanged.
+- RouteListPage.vue
+  - Implemented isEn and i18n via useI18n; added helpers similar to HomePage.
+  - Card title/secondary/summary now bilingual with graceful fallback.
+  - Localized theme tag using themes.* dictionary instead of raw code display.
+- Verification
+  - Previewed in dev server. Switching locale toggles card titles and summaries accordingly.
+  - When English fields are missing, cards fall back to Chinese without empty content.
+  - No console errors observed; terminal shows Vite running at http://localhost:5173/.
+- Next
+  - If needed, align card layout spacing for secondary titles on small screens.
+  - Consider adding per-route image support in the future for richer cards.
+2025-10-29 — Fix theme tag on RouteDetailPage (themes.半日游)
+- Issue: Route detail showed literal key `themes.半日游`, not translating and unclear meaning.
+- Root cause: Backend `route.theme` sometimes carries duration values (e.g., 半日游) which are not part of `themes.*` dictionary; translation fell back to displaying the raw key.
+- Fix:
+  - RouteDetailPage.vue: Added `themeTag` computed to resolve display.
+    - If theme code exists in `themes.*`, show localized label + `THEME_ICONS[code]`.
+    - If value matches duration (`半日游/一日游/多日游` or `halfDay/oneDay/multiDay`), map to `routes.*` labels and localize.
+    - Otherwise, fallback to raw code with icon when available.
+- Verification: Previewed route detail; theme/duration tag now translates and switches with language. No console errors.
+2025-10-29 — Reuse theme/duration tag resolver across pages
+- Created `frontend/src/utils/themeTag.js` with `resolveThemeTag(code, t, icons)` to translate theme codes or map duration values (`半日游/一日游/多日游` and `halfDay/oneDay/multiDay`) to `routes.*` labels; includes optional icons.
+- RouteListPage.vue: Switched theme tag rendering to use resolver; now shows localized label and icon when available, fixing `themes.一日游` raw output.
+- RouteDetailPage.vue: Refactored to use the same resolver for consistency.
+- Preview: Verified on `http://localhost:5173/routes/`; language toggle reflects correct labels; no console errors.
+
+2025-10-29 — Split theme and duration fields; update UI and tooling
+- Requirement: Separate "主题 (theme)" and "时长 (duration)" to avoid ambiguity and enable independent localization.
+- Backend data: Added explicit `duration` to all sample routes in `backend/data/routes.json` (values mirror existing durations like "半日游"/"一日游"). No API changes needed since route endpoints pass fields through.
+- Frontend utility: Extended `frontend/src/utils/themeTag.js` with `isDurationCode` and `resolveDurationTag(code, t)`, keeping `resolveThemeTag` for mixed inputs and compatibility.
+- RouteListPage.vue: Render two tags side-by-side:
+  - Theme tag: shown only when `route.theme` is a theme code (not a duration), with icon via `THEME_ICONS` and label via `themes.*`.
+  - Duration tag: prefers `route.duration`; if missing and `route.theme` is a duration, fallback to it; localized via `routes.oneDay/halfDay/multiDay` with a ⏱️ icon.
+- RouteDetailPage.vue: Header displays both theme and duration with distinct styles, centered alignment; uses the same resolvers and fallback rules.
+- Admin RouteForm.vue: Added editable `theme` (options from `THEME_KEYS`, labels via i18n) and `duration` (半日/一日/多日) select fields; persisted through create/update.
+- Preview: Verified in dev server; language switching correctly updates both theme and duration labels; no browser errors observed.
+- Follow-up: Migrate `theme` values from durations to real theme codes (e.g., "革命足迹") in data to fully utilize the split; ensure future routes provide both fields.

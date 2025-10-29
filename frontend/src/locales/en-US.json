@@ -1,0 +1,131 @@
+{
+  "nav": {
+    "home": "Home",
+    "routes": "Routes",
+    "attractions": "Attractions",
+    "personalization": "Personalization",
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "select": "Select",
+    "selectAll": "Select All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "registerSuccess": "Registration successful",
+    "registerFailed": "Registration failed",
+    "usernameRequired": "Please enter username",
+    "passwordRequired": "Please enter password",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "home": {
+    "title": "Shanghai Red Tourism Route Recommendation System",
+    "subtitle": "Explore Red History, Inherit Revolutionary Spirit",
+    "featuredRoutes": "Featured Routes",
+    "popularAttractions": "Popular Attractions",
+    "startJourney": "Start Journey"
+  },
+  "routes": {
+    "title": "Tourism Routes",
+    "createRoute": "Create Route",
+    "routeName": "Route Name",
+    "routeDescription": "Route Description",
+    "theme": "Theme",
+    "attractions": "Attractions",
+    "addAttraction": "Add Attraction",
+    "removeAttraction": "Remove Attraction",
+    "duration": "Duration",
+    "difficulty": "Difficulty Level",
+    "oneDay": "One Day Tour",
+    "halfDay": "Half Day Tour",
+    "multiDay": "Multi-Day Tour"
+  },
+  "attractions": {
+    "title": "Attractions List",
+    "name": "Attraction Name",
+    "area": "Area",
+    "theme": "Theme Tags",
+    "rating": "Rating",
+    "address": "Address",
+    "description": "Description",
+    "viewDetails": "View Details",
+    "addToRoute": "Add to Route"
+  },
+  "personalization": {
+    "title": "Personalized Recommendations",
+    "preferences": "Preferences",
+    "selectThemes": "Select Themes of Interest",
+    "selectAreas": "Select Areas to Visit",
+    "generateRoute": "Generate Route",
+    "results": "Recommendations",
+    "timeline": "Itinerary",
+    "totalDistance": "Total Distance",
+    "segmentDistance": "Segment Distance"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "manageRoutes": "Manage Routes",
+    "manageAttractions": "Manage Attractions",
+    "users": "User Management",
+    "statistics": "Statistics"
+  },
+  "map": {
+    "loading": "Loading map...",
+    "loadError": "Map temporarily unavailable: Please check Gaode Key or network",
+    "noLocation": "No location information available"
+  },
+  "messages": {
+    "success": "Operation successful",
+    "error": "Operation failed",
+    "networkError": "Network error, please try again later",
+    "dataNotFound": "No relevant data found",
+    "permissionDenied": "Permission denied",
+    "invalidInput": "Invalid input format"
+  },
+  "themes": {
+    "革命足迹": "Revolutionary Footprints",
+    "建党伟业": "Party Founding",
+    "工人运动": "Labor Movement",
+    "革命烈士": "Revolutionary Martyrs",
+    "抗日战争": "Anti-Japanese War",
+    "文化名人": "Cultural Celebrities",
+    "伟人故居": "Great Figures' Residences",
+    "地标": "Landmarks",
+    "观光": "Sightseeing",
+    "古典园林": "Classical Gardens",
+    "历史": "History"
+  },
+  "areas": {
+    "黄浦区": "Huangpu District",
+    "徐汇区": "Xuhui District",
+    "长宁区": "Changning District",
+    "静安区": "Jing'an District",
+    "普陀区": "Putuo District",
+    "虹口区": "Hongkou District",
+    "杨浦区": "Yangpu District"
+  }
+}

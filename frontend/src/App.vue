@@ -2,14 +2,20 @@
   <div id="app-layout">
     <header>
       <nav>
-        <router-link to="/">首页</router-link>
-        <router-link to="/attractions">景点列表</router-link>
-        <router-link to="/routes">路线列表</router-link>
-        <router-link to="/customize">个性化定制</router-link>
+        <div class="nav-left">
+          <router-link to="/">{{ $t('nav.home') }}</router-link>
+          <router-link to="/attractions">{{ $t('attractions.title') }}</router-link>
+          <router-link to="/routes">{{ $t('routes.title') }}</router-link>
+          <router-link to="/customize">{{ $t('personalization.title') }}</router-link>
 
-        <span class="nav-separator">|</span>
-        <router-link to="/admin">后台管理</router-link>
-        <button v-if="isLoggedIn" @click="handleLogout" class="logout-button">登出</button>
+          <span class="nav-separator">|</span>
+          <router-link to="/admin">{{ $t('nav.admin') }}</router-link>
+        </div>
+
+        <div class="nav-right">
+          <LanguageSwitch />
+          <button v-if="isLoggedIn" @click="handleLogout" class="logout-button">{{ $t('nav.logout') }}</button>
+        </div>
       </nav>
     </header>
     <main>
@@ -21,6 +27,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import LanguageSwitch from './components/LanguageSwitch.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -78,7 +85,16 @@ body {
 #app-layout nav {
   display: flex;
   align-items: center; /* Align items vertically */
-  justify-content: center;
+  justify-content: space-between; /* 左右分布 */
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-right {
+  gap: 10px;
 }
 
 #app-layout nav a {

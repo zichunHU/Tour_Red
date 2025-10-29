@@ -1,0 +1,131 @@
+{
+  "nav": {
+    "home": "首页",
+    "routes": "路线",
+    "attractions": "景点",
+    "personalization": "个性化",
+    "admin": "管理后台",
+    "login": "登录",
+    "logout": "退出登录"
+  },
+  "common": {
+    "submit": "提交",
+    "cancel": "取消",
+    "confirm": "确认",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "loading": "加载中...",
+    "search": "搜索",
+    "filter": "筛选",
+    "clear": "清空",
+    "select": "选择",
+    "selectAll": "全选",
+    "none": "无",
+    "yes": "是",
+    "no": "否"
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "username": "用户名",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "loginSuccess": "登录成功",
+    "loginFailed": "登录失败",
+    "registerSuccess": "注册成功",
+    "registerFailed": "注册失败",
+    "usernameRequired": "请输入用户名",
+    "passwordRequired": "请输入密码",
+    "passwordMismatch": "两次输入的密码不一致"
+  },
+  "home": {
+    "title": "上海红色旅游路线推荐系统",
+    "subtitle": "探索红色历史，传承革命精神",
+    "featuredRoutes": "精选路线",
+    "popularAttractions": "热门景点",
+    "startJourney": "开始旅程"
+  },
+  "routes": {
+    "title": "旅游路线",
+    "createRoute": "创建路线",
+    "routeName": "路线名称",
+    "routeDescription": "路线描述",
+    "theme": "主题",
+    "attractions": "景点",
+    "addAttraction": "添加景点",
+    "removeAttraction": "移除景点",
+    "duration": "游览时长",
+    "difficulty": "难度等级",
+    "oneDay": "一日游",
+    "halfDay": "半日游",
+    "multiDay": "多日游"
+  },
+  "attractions": {
+    "title": "景点列表",
+    "name": "景点名称",
+    "area": "所在区域",
+    "theme": "主题标签",
+    "rating": "评分",
+    "address": "地址",
+    "description": "描述",
+    "viewDetails": "查看详情",
+    "addToRoute": "加入路线"
+  },
+  "personalization": {
+    "title": "个性化推荐",
+    "preferences": "偏好设置",
+    "selectThemes": "选择感兴趣的主题",
+    "selectAreas": "选择游览区域",
+    "generateRoute": "生成路线",
+    "results": "推荐结果",
+    "timeline": "行程安排",
+    "totalDistance": "总里程",
+    "segmentDistance": "段距离"
+  },
+  "admin": {
+    "dashboard": "管理面板",
+    "manageRoutes": "路线管理",
+    "manageAttractions": "景点管理",
+    "users": "用户管理",
+    "statistics": "统计信息"
+  },
+  "map": {
+    "loading": "地图加载中...",
+    "loadError": "地图暂不可用：请检查高德 Key 或网络",
+    "noLocation": "暂无位置信息"
+  },
+  "messages": {
+    "success": "操作成功",
+    "error": "操作失败",
+    "networkError": "网络错误，请稍后重试",
+    "dataNotFound": "未找到相关数据",
+    "permissionDenied": "权限不足",
+    "invalidInput": "输入格式不正确"
+  },
+  "themes": {
+    "革命足迹": "革命足迹",
+    "建党伟业": "建党伟业",
+    "工人运动": "工人运动",
+    "革命烈士": "革命烈士",
+    "抗日战争": "抗日战争",
+    "文化名人": "文化名人",
+    "伟人故居": "伟人故居",
+    "地标": "地标",
+    "观光": "观光",
+    "古典园林": "古典园林",
+    "历史": "历史"
+  },
+  "areas": {
+    "黄浦区": "黄浦区",
+    "徐汇区": "徐汇区",
+    "长宁区": "长宁区",
+    "静安区": "静安区",
+    "普陀区": "普陀区",
+    "虹口区": "虹口区",
+    "杨浦区": "杨浦区"
+  }
+}

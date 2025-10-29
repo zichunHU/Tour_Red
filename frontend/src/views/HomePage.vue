@@ -32,6 +32,11 @@ const heroCurrentSlideIndex = ref(0);
 // Drive theme cards from THEME_KEYS to avoid duplication
 const interestTags = computed(() => THEME_KEYS.map(code => ({ code, icon: THEME_ICONS[code] || '🏷️' })))
 
+// Collapse/expand theme section
+const showAllThemes = ref(false)
+const displayedThemes = computed(() => showAllThemes.value ? interestTags.value : interestTags.value.slice(0, 6))
+function toggleThemes() { showAllThemes.value = !showAllThemes.value }
+
 const swiperModules = [Autoplay, Pagination, Navigation];
 
 // Locale-aware bilingual titles for attraction cards
@@ -144,10 +149,15 @@ function exploreTheme(themeCode) {
       <section class="content-section">
         <h2 class="section-title">{{ $t('home.exploreByTheme') }}</h2>
         <div class="theme-grid">
-          <div v-for="theme in interestTags" :key="theme.code" class="theme-card" @click="exploreTheme(theme.code)">
+          <div v-for="theme in displayedThemes" :key="theme.code" class="theme-card" @click="exploreTheme(theme.code)">
             <div class="theme-icon">{{ theme.icon }}</div>
             <h3 class="theme-name">{{ $t(`themes.${theme.code}`) }}</h3>
           </div>
+        </div>
+        <div class="theme-actions">
+          <button class="theme-toggle-btn" @click="toggleThemes">
+            {{ showAllThemes ? $t('common.showLess') : $t('common.showMore') }}
+          </button>
         </div>
       </section>
 
@@ -351,6 +361,30 @@ function exploreTheme(themeCode) {
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0;
+}
+
+.theme-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.theme-toggle-btn {
+  font-family: var(--system-font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--card-background-color);
+  color: var(--primary-text-color);
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--background-color);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
 
 /* --- Card Carousel Sections --- */

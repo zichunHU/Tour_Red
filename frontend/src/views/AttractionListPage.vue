@@ -1,6 +1,7 @@
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 // Reactive state for attractions and loading/error
@@ -15,6 +16,9 @@ const { locale } = useI18n()
 const searchKeyword = ref('')
 const selectedArea = ref('')
 const selectedTheme = ref('')
+
+// Read initial query params for deep-link filtering
+const route = useRoute()
 
 // Unified options from catalog (codes mapped to i18n for display)
 import { AREA_KEYS, THEME_KEYS } from '../constants/catalog.js'
@@ -68,8 +72,27 @@ const fetchAttractions = async () => {
 
 // Fetch initial data when component is mounted
 onMounted(() => {
+  const initialTheme = typeof route.query.theme === 'string' ? route.query.theme : ''
+  const initialArea = typeof route.query.area === 'string' ? route.query.area : ''
+  if (initialTheme) selectedTheme.value = initialTheme
+  if (initialArea) selectedArea.value = initialArea
   fetchAttractions()
 })
+
+// React to query param changes (e.g., clicking theme cards from Home)
+watch(
+  () => ({ theme: route.query.theme, area: route.query.area, keyword: route.query.keyword }),
+  (q) => {
+    const t = typeof q.theme === 'string' ? q.theme : ''
+    const a = typeof q.area === 'string' ? q.area : ''
+    const k = typeof q.keyword === 'string' ? q.keyword : ''
+    let needFetch = false
+    if (t !== selectedTheme.value) { selectedTheme.value = t; needFetch = true }
+    if (a !== selectedArea.value) { selectedArea.value = a; needFetch = true }
+    if (k !== searchKeyword.value) { searchKeyword.value = k; needFetch = true }
+    if (needFetch) fetchAttractions()
+  }
+)
 
 // Handler for the search button
 const handleSearch = () => {

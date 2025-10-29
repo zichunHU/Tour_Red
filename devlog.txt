@@ -611,3 +611,46 @@
 *   **[已知注意事项]**
     *   `/api/routes` 无尾斜杠会返回 HTML 重定向，建议统一使用 `/api/routes/`。
     *   如确认存在 WGS-84 坐标数据，请统一转换为 GCJ-02 后再交由 AMap 渲染。
+
+---
+**日期:** 2025年10月29日 (续4)
+**阶段:** 首页主题卡筛选跳转修复与主题区展开交互
+
+*   **[修复] 首页点击主题卡未正确带筛选的问题:**
+    *   **现象:** 在首页点击主题卡跳转至景点列表页后，未自动按所点主题进行筛选。
+    *   **根因:** 列表页未从 URL 查询参数读取初始筛选值，也未监听查询参数变化。
+    *   **改动:**
+        *   文件：`frontend/src/views/AttractionListPage.vue`
+        *   逻辑：引入 `useRoute` 与 `watch`；在 `onMounted` 时从 `route.query` 读取 `theme/area/keyword` 初始化 `selectedTheme/selectedArea/searchKeyword` 并执行 `fetchAttractions()`；监听 `route.query` 变化并在需要时再次触发 `fetchAttractions()`，从而支持首页深链与回退/前进导航的联动。
+    *   **结果:** 从首页点击主题卡（例如“革命烈士”）后，列表页主题下拉框自动选中该主题且列表数据已按主题筛选。
+
+*   **[新增] 主题区“展开/收起”交互:**
+    *   **动机:** 主题卡较多影响首屏信息密度与视觉聚焦。
+    *   **改动:**
+        *   文件：`frontend/src/views/HomePage.vue`
+        *   数据与模板：新增 `showAllThemes` 与 `displayedThemes`（默认仅展示前 6 项，展开后展示全部）；新增切换按钮 `toggleThemes()`。
+        *   样式：新增 `.theme-actions` 与 `.theme-toggle-btn`，按钮居中、轻量阴影与边框，符合现有设计系统。
+        *   i18n：使用 `common.showMore` 与 `common.showLess` 文案，避免硬编码。
+    *   **词典：**
+        *   `frontend/src/locales/zh-CN.json`：新增 `common.showMore: "展开更多"`、`common.showLess: "收起"`。
+        *   `frontend/src/locales/en-US.json`：新增 `common.showMore: "Show More"`、`common.showLess: "Show Less"`。
+    *   **结果:** 默认呈现 6 张卡片，“展开更多/收起”切换正常，交互在移动端与桌面端表现一致。
+
+*   **[验证] 预览检查:**
+    *   首页 → 点击任一主题卡 → 跳转 `/attractions?theme=...`；列表页对应筛选项回显，数据已按主题过滤；浏览器控制台无报错。
+    *   主题区“展开/收起”按钮在不同分辨率下居中，状态切换与过渡正常。
+
+*   **[仓库回退] 版本基线与安全暂存:**
+    *   **目标提交:** `a2d6aa3f9a84f2677e8a35ad170473f257440049`（fix(地图组件): 修复地图漂移和标记错位问题）。
+    *   **操作流程:**
+        1. 检查工作区改动：`git status --porcelain`
+        2. 保护性暂存：`git stash push -u -m "safety: before reset to a2d6aa3..."`
+        3. 确认提交存在：`git show --no-patch --oneline a2d6aa3...`
+        4. 硬重置：`git reset --hard a2d6aa3...`
+        5. 确认 HEAD：`git log --oneline -n 1`；暂存记录：`git stash list`
+    *   **结果:** HEAD 已回退到目标提交；重置前改动已安全保存在 `stash@{0}`，可按需 `git stash apply/pop` 恢复。
+
+*   **[后续建议]**
+    *   列表页的“搜索/清空筛选”操作可与路由 `query` 双向同步（`router.replace`），便于分享与回溯；如需，我可继续补充。
+    *   考虑在首页主题卡加入“主题计数”徽标（后端聚合或前端计算），增强引导性。
+    *   若未来支持多主题复选，可将 `theme` 支持数组并在 URL 使用多值参数（`theme=a&theme=b`）。

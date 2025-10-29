@@ -30,7 +30,9 @@
     "searchPlaceholder": "Search keywords...",
     "actions": "Actions",
     "create": "Create",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "showMore": "Show More",
+    "showLess": "Show Less"
   },
   "auth": {
     "login": "Login",

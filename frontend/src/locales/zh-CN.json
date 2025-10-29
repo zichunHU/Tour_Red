@@ -31,7 +31,9 @@
     "actions": "操作",
     "create": "新建",
     "example": "例如: 1, 2, 3",
-    "uploading": "上传中..."
+    "uploading": "上传中...",
+    "showMore": "展开更多",
+    "showLess": "收起"
   },
   "auth": {
     "login": "登录",

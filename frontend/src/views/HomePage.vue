@@ -18,7 +18,7 @@ import { THEME_KEYS } from '../constants/catalog.js'
 import { THEME_ICONS } from '../constants/themeIcons.js'
 
 const router = useRouter();
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // --- STATE & DATA FETCHING ---
 const attractions = ref([]);
@@ -74,7 +74,10 @@ const dynamicSubtitle = computed(() => {
   if (!heroSlides.value.length) return t('home.subtitle');
   const currentAttraction = heroSlides.value[heroCurrentSlideIndex.value];
   if (!currentAttraction) return t('home.subtitle');
-  const cleanDescription = stripHtml(currentAttraction.description);
+  const raw = locale.value === 'en-US'
+    ? (currentAttraction.description_en || currentAttraction.description)
+    : (currentAttraction.description || currentAttraction.description_en);
+  const cleanDescription = stripHtml(raw);
   return cleanDescription ? truncate(cleanDescription, 80) : t('home.subtitle');
 });
 

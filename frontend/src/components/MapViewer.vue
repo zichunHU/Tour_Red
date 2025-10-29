@@ -1,6 +1,6 @@
 <template>
   <div ref="mapContainer" class="map-viewer"></div>
-  <div v-if="!amapLoaded" class="map-fallback">地图暂不可用：请检查高德 Key 或网络</div>
+  <div v-if="!amapLoaded" class="map-fallback">{{ $t('map.loadError') }}</div>
 </template>
 
 <script setup>

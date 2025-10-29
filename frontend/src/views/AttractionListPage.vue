@@ -65,42 +65,42 @@ const handleReset = () => {
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h2>景点列表</h2>
-      <p>探索上海的红色文化地标</p>
+      <h2>{{ $t('attractions.title') }}</h2>
+      <p>{{ $t('attractions.subtitle') }}</p>
     </header>
 
     <section class="filters">
       <div class="filter-group">
-        <input type="text" v-model="searchKeyword" placeholder="搜索关键词..." class="search-input" @keyup.enter="handleSearch" />
+        <input type="text" v-model="searchKeyword" :placeholder="$t('common.searchPlaceholder')" class="search-input" @keyup.enter="handleSearch" />
       </div>
       <div class="filter-group">
         <select v-model="selectedArea">
-          <option value="">所有区域</option>
-          <option v-for="area in areaOptions" :key="area" :value="area">{{ area }}</option>
+          <option value="">{{ $t('attractions.allAreas') }}</option>
+          <option v-for="area in areaOptions" :key="area" :value="area">{{ $t(`areas.${area}`) }}</option>
         </select>
         <select v-model="selectedTheme">
-          <option value="">所有主题</option>
-          <option v-for="theme in themeOptions" :key="theme" :value="theme">{{ theme }}</option>
+          <option value="">{{ $t('attractions.allThemes') }}</option>
+          <option v-for="theme in themeOptions" :key="theme" :value="theme">{{ $t(`themes.${theme}`) }}</option>
         </select>
       </div>
       <div class="filter-group">
-        <button @click="handleSearch" class="button-primary">搜索</button>
-        <button @click="handleReset" class="button-secondary">重置</button>
+        <button @click="handleSearch" class="button-primary">{{ $t('common.search') }}</button>
+        <button @click="handleReset" class="button-secondary">{{ $t('common.clear') }}</button>
       </div>
     </section>
 
-    <div v-if="loading">正在加载数据...</div>
-    <div v-if="error" class="error-message">加载失败: {{ error }}</div>
+    <div v-if="loading">{{ $t('common.loading') }}</div>
+    <div v-if="error" class="error-message">{{ $t('messages.networkError') }}: {{ error }}</div>
 
     <section v-if="!loading && !error" class="attractions-list">
-      <p v-if="attractions.length === 0" class="no-results">没有找到符合条件的景点。</p>
+      <p v-if="attractions.length === 0" class="no-results">{{ $t('attractions.noResults') }}</p>
       <router-link v-else v-for="attraction in attractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="card-link">
         <div class="card">
           <img v-if="attraction.image_url" :src="attraction.image_url" :alt="attraction.name" class="card-image">
           <div class="card-content">
             <h3>{{ attraction.name }}</h3>
             <p class="description">{{ attraction.description }}</p>
-            <small class="area-tag">{{ attraction.area }}</small>
+            <small class="area-tag">{{ $t(`areas.${attraction.area}`) }}</small>
           </div>
         </div>
       </router-link>

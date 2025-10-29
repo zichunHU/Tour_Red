@@ -4,9 +4,11 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RichTextEditor from '../components/RichTextEditor.vue' // 导入富文本编辑器组件
 import SingleImageUpload from '../components/SingleImageUpload.vue' // 导入单图片上传组件
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const attraction = ref({
   name: '',
@@ -65,7 +67,7 @@ const handleSubmit = async () => {
       throw new Error(errData.error || 'Save operation failed')
     }
 
-    alert('保存成功!')
+    alert(t('messages.success'))
     router.push('/admin/attractions')
 
   } catch (e) {
@@ -80,47 +82,47 @@ const handleSubmit = async () => {
 
 <template>
   <div>
-    <h1>{{ isEditMode ? '编辑景点' : '新建景点' }}</h1>
-    <div v-if="loading && isEditMode">正在加载数据...</div>
+    <h1>{{ isEditMode ? t('attractions.editAttraction') : t('attractions.createAttraction') }}</h1>
+    <div v-if="loading && isEditMode">{{ t('common.loading') }}</div>
     <div v-if="error" class="error-message">{{ error }}</div>
 
     <form @submit.prevent="handleSubmit" class="admin-form">
       <div class="form-group">
-        <label for="name">名称 (中文)</label>
+        <label for="name">{{ t('attractions.nameZh') }}</label>
         <input id="name" v-model="attraction.name" type="text" required>
       </div>
       <div class="form-group">
-        <label for="name_en">名称 (English)</label>
+        <label for="name_en">{{ t('attractions.nameEn') }}</label>
         <input id="name_en" v-model="attraction.name_en" type="text">
       </div>
       <div class="form-group">
-        <label for="area">区域</label>
+        <label for="area">{{ t('attractions.area') }}</label>
         <input id="area" v-model="attraction.area" type="text">
       </div>
       <div class="form-group">
-        <label for="theme">主题 (逗号分隔)</label>
+        <label for="theme">{{ t('attractions.themeInput') }}</label>
         <input id="theme" :value="attraction.theme.join(', ')" @input="attraction.theme = $event.target.value.split(',').map(t => t.trim())" type="text">
       </div>
       <div class="form-group">
-        <label for="address">地址</label>
+        <label for="address">{{ t('attractions.address') }}</label>
         <input id="address" v-model="attraction.address" type="text">
       </div>
       <div class="form-group">
-        <label>介绍 (中文)</label>
+        <label>{{ t('attractions.descriptionZh') }}</label>
         <RichTextEditor v-model="attraction.description" :attraction-id="route.params.id || 0" />
       </div>
       <div class="form-group">
-        <label>介绍 (English)</label>
+        <label>{{ t('attractions.descriptionEn') }}</label>
         <RichTextEditor v-model="attraction.description_en" :attraction-id="route.params.id || 0" />
       </div>
       <div class="form-group">
-        <label>主图片</label>
+        <label>{{ t('attractions.mainImage') }}</label>
         <SingleImageUpload v-model="attraction.image_url" :attraction-id="route.params.id || 0" />
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" :disabled="loading">{{ loading ? '保存中...' : '保存' }}</button>
-        <router-link to="/admin/attractions" class="btn btn-secondary">取消</router-link>
+        <button type="submit" class="btn btn-primary" :disabled="loading">{{ loading ? t('common.loading') : t('common.save') }}</button>
+        <router-link to="/admin/attractions" class="btn btn-secondary">{{ t('common.cancel') }}</router-link>
       </div>
     </form>
   </div>

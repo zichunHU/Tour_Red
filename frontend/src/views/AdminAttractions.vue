@@ -2,11 +2,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const attractions = ref([])
 const loading = ref(true)
 const error = ref(null)
 const router = useRouter()
+const { t } = useI18n()
 
 const apiUrl = '/api';
 
@@ -25,7 +27,7 @@ const fetchAttractions = async () => {
 }
 
 const deleteAttraction = async (id) => {
-  if (!confirm('确定要删除这个景点吗？此操作不可撤销。')) {
+  if (!confirm(t('messages.deleteConfirmAttraction'))) {
     return
   }
   try {
@@ -36,7 +38,7 @@ const deleteAttraction = async (id) => {
     // Refresh the list after deletion
     await fetchAttractions()
   } catch (e) {
-    alert(`删除失败: ${e.message}`)
+    alert(t('messages.deleteFailed', { error: e.message }))
   }
 }
 
@@ -47,20 +49,20 @@ onMounted(fetchAttractions)
 <template>
   <div>
     <div class="header-container">
-      <h1>景点管理</h1>
-      <router-link to="/admin/attractions/new" class="btn btn-primary">新建景点</router-link>
+      <h1>{{ t('admin.manageAttractions') }}</h1>
+      <router-link to="/admin/attractions/new" class="btn btn-primary">{{ t('attractions.createAttraction') }}</router-link>
     </div>
 
-    <div v-if="loading">正在加载...</div>
+    <div v-if="loading">{{ t('common.loading') }}</div>
     <div v-if="error" class="error-message">{{ error }}</div>
 
     <table v-if="attractions.length > 0" class="admin-table">
       <thead>
         <tr>
           <th>ID</th>
-          <th>名称</th>
-          <th>区域</th>
-          <th>操作</th>
+          <th>{{ t('attractions.name') }}</th>
+          <th>{{ t('attractions.area') }}</th>
+          <th>{{ t('common.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -69,13 +71,13 @@ onMounted(fetchAttractions)
           <td>{{ attraction.name }}</td>
           <td>{{ attraction.area }}</td>
           <td class="actions">
-            <router-link :to="`/admin/attractions/edit/${attraction.id}`" class="btn btn-secondary">编辑</router-link>
-            <button @click="deleteAttraction(attraction.id)" class="btn btn-danger">删除</button>
+            <router-link :to="`/admin/attractions/edit/${attraction.id}`" class="btn btn-secondary">{{ t('common.edit') }}</router-link>
+            <button @click="deleteAttraction(attraction.id)" class="btn btn-danger">{{ t('common.delete') }}</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <p v-else-if="!loading">没有找到任何景点。</p>
+    <p v-else-if="!loading">{{ t('attractions.noResults') }}</p>
   </div>
 </template>
 

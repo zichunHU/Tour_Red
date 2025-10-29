@@ -125,16 +125,16 @@ function startOver() {
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h2>个性化路线定制</h2>
-      <p>选择您感兴趣的主题和景点，我们将为您生成专属的红色路线</p>
-      <Stepper :steps="[{ key: 'selection', label: '选择' }, { key: 'results', label: '结果' }]" :current="step" />
+    <h2>{{ $t('personalization.title') }}</h2>
+    <p>{{ $t('personalization.preferences') }}</p>
+    <Stepper :steps="[{ key: 'selection', label: $t('common.select') }, { key: 'results', label: $t('personalization.results') }]" :current="step" />
     </header>
 
     <!-- Step 1: Selection Phase -->
     <section v-if="step === 'selection'">
       <!-- Interest Tag Filters -->
       <div class="filters-container">
-        <h4>1. 选择兴趣主题</h4>
+        <h4>1. {{ $t('personalization.selectThemes') }}</h4>
         <div class="tag-group">
           <TagChip
             v-for="tag in interestTags"
@@ -151,7 +151,7 @@ function startOver() {
       <!-- Attraction Selection -->
       <div v-if="!loading && !error" class="selection-grid">
         <div class="attraction-list-container">
-          <h4>2. 选择您想去的景点 (已选 {{ selectedAttractions.size }} 个)</h4>
+          <h4>2. {{ $t('personalization.selectAttractionsWithCount', { count: selectedAttractions.size }) }}</h4>
           <ul class="attraction-list">
             <li v-for="attraction in filteredAttractions" :key="attraction.id" @click="toggleAttractionSelection(attraction.id)" :class="{ selected: selectedAttractions.has(attraction.id) }">
               <div class="card">
@@ -206,12 +206,12 @@ function startOver() {
         </div>
         <div class="map-container-wrapper">
           <MapViewer :waypoints="generatedRoute.attractions" />
-          <div class="map-hint">若地图未显示，请检查高德 Key 与安全码或网络状态</div>
+          <div class="map-hint">{{ $t('map.loadError') }}</div>
         </div>
       </div>
 
       <div class="actions-footer sticky">
-        <button @click="startOver" class="button-secondary">重新规划</button>
+        <button @click="startOver" class="button-secondary">{{ $t('common.clear') }}</button>
       </div>
     </section>
 

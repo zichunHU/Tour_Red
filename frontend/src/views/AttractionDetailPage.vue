@@ -38,14 +38,14 @@ const goBack = () => {
 
 <template>
   <div class="page-container">
-    <div v-if="loading">正在加载详情...</div>
-    <div v-if="error" class="error-message">加载失败: {{ error }}</div>
+    <div v-if="loading">{{ $t('common.loading') }}</div>
+    <div v-if="error" class="error-message">{{ $t('messages.networkError') }}: {{ error }}</div>
 
     <article v-if="attraction" class="detail-card">
       <img v-if="attraction.image_url" :src="attraction.image_url" :alt="attraction.name" class="detail-hero-image">
       
       <header class="detail-header">
-        <button @click="goBack" class="back-button">&larr; 返回列表</button>
+        <button @click="goBack" class="back-button">&larr; {{ $t('common.back') }}</button>
         <h1>{{ attraction.name }}</h1>
         <p class="name-en">{{ attraction.name_en }}</p>
       </header>
@@ -57,29 +57,29 @@ const goBack = () => {
         </div>
 
         <div v-if="attraction.address" class="address-section">
-          <p><strong>地址:</strong> {{ attraction.address }}</p>
+          <p><strong>{{ $t('attractions.address') }}:</strong> {{ attraction.address }}</p>
         </div>
         
         <div class="content-grid">
           <div class="description-container">
             <div class="description">
-              <h3>中文介绍</h3>
+              <h3>{{ $t('attractions.description') }}</h3>
               <div v-html="attraction.description" class="markdown-content"></div>
 
-              <h3>English Introduction</h3>
+              <h3>{{ $t('attractions.description') }}</h3>
               <div v-html="attraction.description_en" class="markdown-content"></div>
             </div>
           </div>
 
           <aside class="map-container">
-            <h3>位置信息</h3>
+            <h3>{{ $t('map.loading') }}</h3>
             <MapViewer 
               v-if="attraction.location && attraction.location.latitude && attraction.location.longitude"
               :latitude="attraction.location.latitude" 
               :longitude="attraction.location.longitude"
             />
             <div v-else class="no-location">
-              暂无地理位置信息
+              {{ $t('map.noLocation') }}
             </div>
           </aside>
         </div>

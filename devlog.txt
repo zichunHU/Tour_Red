@@ -276,7 +276,85 @@
     *   当前前端配置：`frontend/index.html` 已设置 `key=8ad4201c7e53e40ab43d69fca03a83d5` 与 `securityJsCode=9882b47f92bd4392bee32d82221eb246`。
     *   后续建议：将密钥迁移至环境变量（Vite 与 Flask），减少硬编码与泄露风险。
 
-*   **[文档] 补充 README:**
-    *   新增“个性化结果页”说明与“高德地图密钥配置与故障排查”章节，指导开发与部署时的正确配置与常见问题处理。
+ *   **[文档] 补充 README:**
+     *   新增“个性化结果页”说明与“高德地图密钥配置与故障排查”章节，指导开发与部署时的正确配置与常见问题处理。
 
-*   **结果:** 个性化结果页的信息结构更清晰，地图不可用场景的用户反馈更明确；密钥与网络问题的诊断路径完善，整体可用性提升。
+ *   **结果:** 个性化结果页的信息结构更清晰，地图不可用场景的用户反馈更明确；密钥与网络问题的诊断路径完善，整体可用性提升。
+ 
+---
+
+**日期:** 2025年10月29日 (续)
+**阶段:** 全站国际化(i18n)文案完善与后台页面国际化
+
+*   **[执行] 文案国际化（用户侧页面）:**
+    *   将首页、景点列表、景点详情、路线列表、路线详情、个性化页面的中文 UI 文本替换为 i18n 键。
+    *   文件涉及：`HomePage.vue`, `AttractionListPage.vue`, `AttractionDetailPage.vue`, `RouteListPage.vue`, `RouteDetailPage.vue`, `PersonalizationPage.vue`, `components/MapViewer.vue`。
+    *   统一加载提示使用 `common.loading`，错误提示使用 `messages.networkError`，地图不可用提示使用 `map.loadError`。
+
+*   **[执行] 文案国际化（后台管理页面）:**
+    *   `AdminDashboard.vue`：标题、欢迎语、卡片标题与描述使用 `admin.dashboard`、`admin.welcome`、`admin.manageAttractions`、`admin.attractionsDescription`、`admin.manageRoutes`、`admin.routesDescription`。
+    *   `AdminAttractions.vue`：新增 `useI18n`，表头与按钮使用 `attractions.name`、`attractions.area`、`common.actions`、`common.edit`、`common.delete`、`attractions.createAttraction`；删除确认与失败提示使用 `messages.deleteConfirmAttraction`、`messages.deleteFailed`。
+    *   `AdminRoutes.vue`：新增 `useI18n`，表头与按钮使用 `routes.routeName`、`routes.attractionCount`、`common.actions`、`routes.createRoute`；删除确认与失败提示使用 `messages.deleteConfirmRoute`、`messages.deleteFailed`；空态提示 `routes.noResults`。
+    *   `RouteForm.vue`：新增 `useI18n`，标题与字段标签使用 `routes.editRoute`/`routes.createRoute`、`routes.routeName`、`routes.routeDescription`、`routes.attractionIdsLabel`，示例提示 `routes.attractionIdsExample`；提交成功提示 `messages.success`；按钮使用 `common.save`、`common.cancel`。
+    *   `AttractionForm.vue`：新增 `useI18n`，标题与字段标签使用 `attractions.editAttraction`/`attractions.createAttraction`、`attractions.nameZh`、`attractions.nameEn`、`attractions.area`、`attractions.themeInput`、`attractions.address`、`attractions.descriptionZh`、`attractions.descriptionEn`、`attractions.mainImage`；提交成功提示 `messages.success`；按钮使用 `common.save`、`common.cancel`。
+
+*   **[执行] 国际化词典更新:**
+    *   `frontend/src/locales/zh-CN.json` 与 `en-US.json` 同步新增：
+        *   `common`：`actions`、`create`、`example`。
+        *   `routes`：`editRoute`、`attractionIdsLabel`、`attractionIdsExample`、`attractionCount`、`noResults`。
+        *   `attractions`：`createAttraction`、`editAttraction`、`nameZh`、`nameEn`、`themeInput`、`descriptionZh`、`descriptionEn`、`mainImage`。
+        *   `admin`：`welcome`、`attractionsDescription`、`routesDescription`。
+        *   `messages`：`deleteConfirmAttraction`、`deleteConfirmRoute`、`deleteFailed`。
+        *   `map`：补充 `location` 键用于位置信息标题。
+
+*   **[验证] 启动与预览:**
+    *   启动前端开发服务器：`npm run dev -- --host`。
+    *   预览地址：`http://localhost:5173/`。
+    *   浏览器未见错误；终端存在 Sass 旧版 API 的弃用提醒，不影响运行。
+
+*   **结果:** 前台与后台主要页面已完成中文/英文文案国际化，交互与提示统一；国际化词典与组件引用保持一致，开发与维护成本降低。
+
+---
+
+**日期:** 2025年10月29日 (续)
+**阶段:** 个性化页面标题英文版本补齐
+
+*   **[修复] Personalized Recommendations 标题国际化:**
+    *   将 `PersonalizationPage.vue` 中中文标题替换为 i18n：
+        *   Step 1: `personalization.selectThemes`
+        *   Step 2: `personalization.selectAttractionsWithCount`（支持 `{count}` 插值）
+    *   更新词典：
+        *   `zh-CN.json`：新增 `personalization.selectAttractionsWithCount` = "选择您想去的景点 (已选 {count} 个)"
+        *   `en-US.json`：新增 `personalization.selectAttractionsWithCount` = "Choose attractions you want to visit (selected {count})"
+
+*   **[验证] 预览:** 打开 `http://localhost:5173/`，浏览器无错误；终端仍有 Dart Sass 旧 API 弃用提醒，不影响功能。
+
+*   **结果:** 个性化页面的两个步骤标题已具备英文版本，计数插值在中英文环境下正确显示。
+
+---
+
+**日期:** 2025年10月29日 (续)
+**阶段:** 前端界面国际化遗漏审计（不改动详情页）
+
+*   **[审计] 仍含中文硬编码的 UI 文案（需后续替换为 i18n）：**
+    *   `views/PersonalizationPage.vue`：
+        *   “正在生成...”、“生成我的专属路线”、“请至少选择两个景点以生成路线”。
+        *   “推荐路线顺序”、“总里程约：... 公里”、“距离上一个点 ≈ ... 公里”。
+        *   建议新增键：`personalization.generating`、`personalization.generateMyRoute`、`personalization.selectAtLeastTwo`、`personalization.recommendedOrder`、`personalization.totalDistanceApprox`、`personalization.distanceFromPrevious`，并考虑 `common.km` 统一公里单位。
+    *   `components/SingleImageUpload.vue`：
+        *   “无图片”、“上传中...” 、“选择并上传图片”、“请先保存景点以启用图片上传。”、错误抛出“图片上传失败: ...”。
+        *   建议新增键：`upload.noImage`、`common.uploading`、`upload.selectAndUpload`、`upload.saveAttractionHint`、`messages.uploadFailed`。
+    *   `components/RichTextEditor.vue`：
+        *   `alert('图片上传失败: ' + error.message)`。
+        *   建议复用 `messages.uploadFailed`。
+    *   `views/HomePage.vue`：
+        *   主题数组使用中文名称；`heroSlides` 兜底文案中文。
+        *   建议改为 `themes.*` 映射；新增 `home.heroFallback`。
+    *   `views/AttractionListPage.vue`：
+        *   `areaOptions`、`themeOptions` 使用中文字面量数组。
+        *   建议改为使用 `areas.*`、`themes.*` 通过映射构造选项。
+
+*   **[范围限定] 未改动：**
+    *   按要求此次未改动景点详情与路线详情列表（`AttractionDetailPage.vue`、`RouteDetailPage.vue`）。
+
+*   **结果:** 已完成前端界面中文硬编码的审计与清单整理，后续可分批次将上述位置替换为 i18n 键并补充词典，确保中英文一致性。

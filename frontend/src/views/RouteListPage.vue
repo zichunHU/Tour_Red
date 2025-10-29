@@ -24,12 +24,12 @@ onMounted(async () => {
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h2>主题路线</h2>
-      <p>探索我们为您精心设计的红色文化之旅</p>
+      <h2>{{ $t('routes.title') }}</h2>
+      <p>{{ $t('home.subtitle') }}</p>
     </header>
 
-    <div v-if="loading">正在加载数据...</div>
-    <div v-if="error" class="error-message">加载失败: {{ error }}</div>
+    <div v-if="loading">{{ $t('common.loading') }}</div>
+    <div v-if="error" class="error-message">{{ $t('messages.networkError') }}: {{ error }}</div>
 
     <section v-if="!loading && !error" class="routes-list">
       <router-link v-for="route in routes" :key="route.id" :to="'/routes/' + route.id" class="card-link">

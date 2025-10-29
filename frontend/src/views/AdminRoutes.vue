@@ -2,11 +2,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const routes = ref([])
 const loading = ref(true)
 const error = ref(null)
 const router = useRouter()
+const { t } = useI18n()
 
 const apiUrl = '/api';
 
@@ -25,7 +27,7 @@ const fetchRoutes = async () => {
 }
 
 const deleteRoute = async (id) => {
-  if (!confirm('确定要删除这条路线吗？此操作不可撤销。')) {
+  if (!confirm(t('messages.deleteConfirmRoute'))) {
     return
   }
   try {
@@ -35,7 +37,7 @@ const deleteRoute = async (id) => {
     if (!response.ok) throw new Error('Failed to delete route')
     await fetchRoutes()
   } catch (e) {
-    alert(`删除失败: ${e.message}`)
+    alert(t('messages.deleteFailed', { error: e.message }))
   }
 }
 
@@ -46,20 +48,20 @@ onMounted(fetchRoutes)
 <template>
   <div>
     <div class="header-container">
-      <h1>路线管理</h1>
-      <router-link to="/admin/routes/new" class="btn btn-primary">新建路线</router-link>
+      <h1>{{ t('admin.manageRoutes') }}</h1>
+      <router-link to="/admin/routes/new" class="btn btn-primary">{{ t('routes.createRoute') }}</router-link>
     </div>
 
-    <div v-if="loading">正在加载...</div>
+    <div v-if="loading">{{ t('common.loading') }}</div>
     <div v-if="error" class="error-message">{{ error }}</div>
 
     <table v-if="routes.length > 0" class="admin-table">
       <thead>
         <tr>
           <th>ID</th>
-          <th>名称</th>
-          <th>包含景点数</th>
-          <th>操作</th>
+          <th>{{ t('routes.routeName') }}</th>
+          <th>{{ t('routes.attractionCount') }}</th>
+          <th>{{ t('common.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -68,13 +70,13 @@ onMounted(fetchRoutes)
           <td>{{ route.name }}</td>
           <td>{{ route.attraction_ids.length }}</td>
           <td class="actions">
-            <router-link :to="`/admin/routes/edit/${route.id}`" class="btn btn-secondary">编辑</router-link>
-            <button @click="deleteRoute(route.id)" class="btn btn-danger">删除</button>
+            <router-link :to="`/admin/routes/edit/${route.id}`" class="btn btn-secondary">{{ t('common.edit') }}</router-link>
+            <button @click="deleteRoute(route.id)" class="btn btn-danger">{{ t('common.delete') }}</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <p v-else-if="!loading">没有找到任何路线。</p>
+    <p v-else-if="!loading">{{ t('routes.noResults') }}</p>
   </div>
 </template>
 

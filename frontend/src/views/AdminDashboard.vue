@@ -2,20 +2,20 @@
 <template>
   <div class="admin-dashboard-container">
     <header class="admin-dashboard-header">
-      <h1>后台管理面板</h1>
-      <p>欢迎回来，管理员！在这里管理您的景点和路线。</p>
+      <h1>{{ $t('admin.dashboard') }}</h1>
+      <p>{{ $t('admin.welcome') }}</p>
     </header>
 
     <section class="dashboard-cards-grid">
       <router-link to="/admin/attractions" class="dashboard-card">
         <div class="card-icon">🏛️</div>
-        <h2 class="card-title">景点管理</h2>
-        <p class="card-description">添加、编辑或删除景点信息。</p>
+        <h2 class="card-title">{{ $t('admin.manageAttractions') }}</h2>
+        <p class="card-description">{{ $t('admin.attractionsDescription') }}</p>
       </router-link>
       <router-link to="/admin/routes" class="dashboard-card">
         <div class="card-icon">🗺️</div>
-        <h2 class="card-title">路线管理</h2>
-        <p class="card-description">创建、修改或移除推荐路线。</p>
+        <h2 class="card-title">{{ $t('admin.manageRoutes') }}</h2>
+        <p class="card-description">{{ $t('admin.routesDescription') }}</p>
       </router-link>
     </section>
   </div>

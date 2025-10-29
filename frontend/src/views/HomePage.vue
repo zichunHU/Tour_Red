@@ -113,16 +113,16 @@ function exploreTheme(themeName) {
       </Swiper>
       
       <div class="hero-content-overlay">
-        <h1 class="hero-title">探寻初心之城，开启红色之旅</h1>
+        <h1 class="hero-title">{{ $t('home.subtitle') }}</h1>
         <p class="hero-subtitle">{{ dynamicSubtitle }}</p>
-        <button @click="navigateToPersonalization" class="hero-cta-button">开始定制您的专属路线</button>
+        <button @click="navigateToPersonalization" class="hero-cta-button">{{ $t('home.startJourney') }}</button>
       </div>
     </section>
 
     <div class="page-content">
       <!-- 2. Thematic Exploration Section -->
       <section class="content-section">
-        <h2 class="section-title">按主题探索</h2>
+        <h2 class="section-title">{{ $t('home.exploreByTheme') }}</h2>
         <div class="theme-grid">
           <div v-for="theme in interestTags" :key="theme.name" class="theme-card" @click="exploreTheme(theme.name)">
             <div class="theme-icon">{{ theme.icon }}</div>
@@ -133,8 +133,8 @@ function exploreTheme(themeName) {
 
       <!-- 3. Featured Attractions Section with Swiper -->
       <section class="content-section">
-        <h2 class="section-title">热门景点推荐</h2>
-        <div v-if="loading">正在加载...</div>
+        <h2 class="section-title">{{ $t('home.popularAttractions') }}</h2>
+        <div v-if="loading">{{ $t('common.loading') }}</div>
         <div v-if="error">{{ error }}</div>
         <Swiper
           v-if="featuredAttractions.length"
@@ -164,7 +164,7 @@ function exploreTheme(themeName) {
 
       <!-- 4. Featured Routes Section with Swiper -->
       <section class="content-section">
-        <h2 class="section-title">精选路线</h2>
+        <h2 class="section-title">{{ $t('home.featuredRoutes') }}</h2>
          <Swiper
           v-if="featuredRoutes.length"
           class="card-swiper"
@@ -184,7 +184,7 @@ function exploreTheme(themeName) {
                 <div class="route-card-content">
                   <h3 class="route-card-title">{{ route.name }}</h3>
                   <p class="route-card-description">{{ route.description }}</p>
-                  <span class="route-card-tag">包含 {{ route.attraction_ids.length }} 个景点</span>
+                  <span class="route-card-tag">{{ $t('routes.includesAttractionCount', { count: route.attraction_ids.length }) }}</span>
                 </div>
               </div>
             </router-link>

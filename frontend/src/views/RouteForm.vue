@@ -2,9 +2,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const tourRoute = ref({
   name: '',
@@ -67,7 +69,7 @@ const handleSubmit = async () => {
       throw new Error(errData.error || 'Save operation failed')
     }
 
-    alert('保存成功!')
+    alert(t('messages.success'))
     router.push('/admin/routes')
 
   } catch (e) {
@@ -82,28 +84,28 @@ const handleSubmit = async () => {
 
 <template>
   <div>
-    <h1>{{ isEditMode ? '编辑路线' : '新建路线' }}</h1>
-    <div v-if="loading && isEditMode">正在加载数据...</div>
+    <h1>{{ isEditMode ? t('routes.editRoute') : t('routes.createRoute') }}</h1>
+    <div v-if="loading && isEditMode">{{ t('common.loading') }}</div>
     <div v-if="error" class="error-message">{{ error }}</div>
 
     <form @submit.prevent="handleSubmit" class="admin-form">
       <div class="form-group">
-        <label for="name">路线名称</label>
+        <label for="name">{{ t('routes.routeName') }}</label>
         <input id="name" v-model="tourRoute.name" type="text" required>
       </div>
       <div class="form-group">
-        <label for="description">路线描述</label>
+        <label for="description">{{ t('routes.routeDescription') }}</label>
         <textarea id="description" v-model="tourRoute.description" rows="5"></textarea>
       </div>
       <div class="form-group">
-        <label for="attraction_ids">包含的景点ID (用逗号分隔)</label>
+        <label for="attraction_ids">{{ t('routes.attractionIdsLabel') }}</label>
         <input id="attraction_ids" :value="tourRoute.attraction_ids.join(', ')" @input="tourRoute.attraction_ids = $event.target.value.split(',').map(t => t.trim())" type="text">
-        <small>例如: 1, 2, 3</small>
+        <small>{{ t('routes.attractionIdsExample') }}</small>
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" :disabled="loading">{{ loading ? '保存中...' : '保存' }}</button>
-        <router-link to="/admin/routes" class="btn btn-secondary">取消</router-link>
+        <button type="submit" class="btn btn-primary" :disabled="loading">{{ loading ? t('common.loading') : t('common.save') }}</button>
+        <router-link to="/admin/routes" class="btn btn-secondary">{{ t('common.cancel') }}</router-link>
       </div>
     </form>
   </div>

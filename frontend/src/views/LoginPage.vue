@@ -1,16 +1,16 @@
 <template>
   <div class="login-container">
     <form @submit.prevent="handleLogin" class="login-form">
-      <h2>管理员登录</h2>
+      <h2>{{ $t('auth.login') }}</h2>
       <div class="form-group">
-        <label for="username">用户名:</label>
+        <label for="username">{{ $t('auth.username') }}:</label>
         <input type="text" id="username" v-model="username" required>
       </div>
       <div class="form-group">
-        <label for="password">密码:</label>
+        <label for="password">{{ $t('auth.password') }}:</label>
         <input type="password" id="password" v-model="password" required>
       </div>
-      <button type="submit" class="login-button" :disabled="loading">{{ loading ? '登录中...' : '登录' }}</button>
+      <button type="submit" class="login-button" :disabled="loading">{{ loading ? $t('common.loading') : $t('auth.login') }}</button>
       <p v-if="error" class="error-message">{{ error }}</p>
     </form>
   </div>
@@ -18,6 +18,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 const username = ref('')
@@ -43,7 +44,7 @@ const handleLogin = async () => {
 
     if (!response.ok) {
       const errData = await response.json()
-      throw new Error(errData.message || '登录失败')
+      throw new Error(errData.message || t('auth.loginFailed'))
     }
 
     // For simplicity, store a flag in localStorage
@@ -133,3 +134,4 @@ const handleLogin = async () => {
   font-size: 0.9rem;
 }
 </style>
+const { t } = useI18n()

@@ -52,12 +52,12 @@ const goBack = () => {
 
 <template>
   <div class="page-container">
-    <div v-if="loading">正在加载路线详情...</div>
-    <div v-if="error" class="error-message">加载失败: {{ error }}</div>
+    <div v-if="loading">{{ $t('common.loading') }}</div>
+    <div v-if="error" class="error-message">{{ $t('messages.networkError') }}: {{ error }}</div>
 
     <article v-if="routeData" class="detail-card">
       <header class="detail-header">
-        <button @click="goBack" class="back-button">&larr; 返回列表</button>
+        <button @click="goBack" class="back-button">&larr; {{ $t('common.back') }}</button>
         <h1>{{ routeData.name }}</h1>
         <p class="name-en">{{ routeData.name_en }}</p>
         <span class="tag theme-tag">{{ routeData.theme }}</span>
@@ -67,12 +67,12 @@ const goBack = () => {
         <div class="left-column">
           <section class="detail-content">
             <div class="description">
-              <h3>路线介绍</h3>
+              <h3>{{ $t('routes.routeDescription') }}</h3>
               <p>{{ routeData.description }}</p>
             </div>
 
             <div class="attractions-section">
-              <h3>包含景点</h3>
+              <h3>{{ $t('routes.attractions') }}</h3>
               <div class="attractions-container">
                 <router-link v-for="attraction in routeData.attractions" :key="attraction.id" :to="'/attractions/' + attraction.id" class="attraction-card-link">
                   <div class="attraction-card">

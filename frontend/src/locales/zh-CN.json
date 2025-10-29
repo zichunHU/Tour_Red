@@ -26,7 +26,11 @@
     "selectAll": "全选",
     "none": "无",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "searchPlaceholder": "搜索关键词...",
+    "actions": "操作",
+    "create": "新建",
+    "example": "例如: 1, 2, 3"
   },
   "auth": {
     "login": "登录",
@@ -45,6 +49,7 @@
   "home": {
     "title": "上海红色旅游路线推荐系统",
     "subtitle": "探索红色历史，传承革命精神",
+    "exploreByTheme": "按主题探索",
     "featuredRoutes": "精选路线",
     "popularAttractions": "热门景点",
     "startJourney": "开始旅程"
@@ -56,16 +61,23 @@
     "routeDescription": "路线描述",
     "theme": "主题",
     "attractions": "景点",
+    "includesAttractionCount": "包含 {count} 个景点",
     "addAttraction": "添加景点",
     "removeAttraction": "移除景点",
     "duration": "游览时长",
     "difficulty": "难度等级",
     "oneDay": "一日游",
     "halfDay": "半日游",
-    "multiDay": "多日游"
+    "multiDay": "多日游",
+    "editRoute": "编辑路线",
+    "attractionIdsLabel": "包含的景点ID (用逗号分隔)",
+    "attractionIdsExample": "例如: 1, 2, 3",
+    "attractionCount": "包含景点数",
+    "noResults": "没有找到任何路线。"
   },
   "attractions": {
     "title": "景点列表",
+    "subtitle": "探索上海的红色文化地标",
     "name": "景点名称",
     "area": "所在区域",
     "theme": "主题标签",
@@ -73,7 +85,18 @@
     "address": "地址",
     "description": "描述",
     "viewDetails": "查看详情",
-    "addToRoute": "加入路线"
+    "addToRoute": "加入路线",
+    "noResults": "没有找到符合条件的景点。",
+    "allAreas": "所有区域",
+    "allThemes": "所有主题",
+    "createAttraction": "新建景点",
+    "editAttraction": "编辑景点",
+    "nameZh": "名称 (中文)",
+    "nameEn": "名称 (English)",
+    "themeInput": "主题 (逗号分隔)",
+    "descriptionZh": "介绍 (中文)",
+    "descriptionEn": "介绍 (English)",
+    "mainImage": "主图片"
   },
   "personalization": {
     "title": "个性化推荐",
@@ -84,19 +107,24 @@
     "results": "推荐结果",
     "timeline": "行程安排",
     "totalDistance": "总里程",
-    "segmentDistance": "段距离"
+    "segmentDistance": "段距离",
+    "selectAttractionsWithCount": "选择您想去的景点 (已选 {count} 个)"
   },
   "admin": {
     "dashboard": "管理面板",
     "manageRoutes": "路线管理",
     "manageAttractions": "景点管理",
     "users": "用户管理",
-    "statistics": "统计信息"
+    "statistics": "统计信息",
+    "welcome": "欢迎回来，管理员！在这里管理您的景点和路线。",
+    "attractionsDescription": "添加、编辑或删除景点信息。",
+    "routesDescription": "创建、修改或移除推荐路线。"
   },
   "map": {
     "loading": "地图加载中...",
     "loadError": "地图暂不可用：请检查高德 Key 或网络",
-    "noLocation": "暂无位置信息"
+    "noLocation": "暂无位置信息",
+    "location": "位置信息"
   },
   "messages": {
     "success": "操作成功",
@@ -104,7 +132,10 @@
     "networkError": "网络错误，请稍后重试",
     "dataNotFound": "未找到相关数据",
     "permissionDenied": "权限不足",
-    "invalidInput": "输入格式不正确"
+    "invalidInput": "输入格式不正确",
+    "deleteFailed": "删除失败: {error}",
+    "deleteConfirmAttraction": "确定要删除这个景点吗？此操作不可撤销。",
+    "deleteConfirmRoute": "确定要删除这条路线吗？此操作不可撤销。"
   },
   "themes": {
     "革命足迹": "革命足迹",

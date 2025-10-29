@@ -55,6 +55,45 @@ const secondaryAddress = computed(() => {
   return isEn.value ? (a.address || '') : (a.address_en || '')
 })
 
+// Language-aware opening hours and reservation (show current language first)
+const primaryOpeningHours = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.opening_hours_en || a.opening_hours || '') : (a.opening_hours || a.opening_hours_en || '')
+})
+const secondaryOpeningHours = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.opening_hours || '') : (a.opening_hours_en || '')
+})
+const primaryReservation = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.reservation_en || a.reservation || '') : (a.reservation || a.reservation_en || '')
+})
+const secondaryReservation = computed(() => {
+  if (!attraction.value) return ''
+  const a = attraction.value
+  return isEn.value ? (a.reservation || '') : (a.reservation_en || '')
+})
+
+// Extract phone-like number from reservation text for click-to-call
+const parsePhoneParts = (text) => {
+  if (!text) return null
+  const match = text.match(/(\+?\d[\d\s\-]{5,}\d)/)
+  if (!match) return null
+  const phone = match[1]
+  const idx = text.indexOf(phone)
+  return {
+    before: text.slice(0, idx),
+    phone,
+    after: text.slice(idx + phone.length)
+  }
+}
+
+const reservationPrimaryParts = computed(() => parsePhoneParts(primaryReservation.value))
+const reservationSecondaryParts = computed(() => parsePhoneParts(secondaryReservation.value))
+
 onMounted(async () => {
   const attractionId = route.params.id
   try {
@@ -101,8 +140,43 @@ const goBack = () => {
         </div>
 
         <div v-if="primaryAddress || secondaryAddress" class="address-section">
-          <p v-if="primaryAddress"><strong>{{ $t('attractions.address') }}:</strong> {{ primaryAddress }}</p>
-          <p v-if="secondaryAddress" class="address-secondary">{{ secondaryAddress }}</p>
+          <p v-if="primaryAddress" class="info-row">
+            <span class="info-icon">📍</span>
+            <span class="info-content"><strong>{{ $t('attractions.address') }}:</strong> {{ primaryAddress }}</span>
+          </p>
+          <p v-if="secondaryAddress" class="info-row info-secondary info-content-offset">{{ secondaryAddress }}</p>
+        </div>
+
+        <div v-if="primaryOpeningHours || primaryReservation" class="info-section">
+          <p v-if="primaryOpeningHours" class="info-row">
+            <span class="info-icon">🕒</span>
+            <span class="info-content"><strong>{{ $t('attractions.openingHours') }}:</strong> {{ primaryOpeningHours }}</span>
+          </p>
+          <p v-if="secondaryOpeningHours" class="info-row info-secondary info-content-offset">{{ secondaryOpeningHours }}</p>
+          <p v-if="primaryReservation" class="info-row">
+            <span class="info-icon">☎️</span>
+            <span class="info-content">
+              <strong>{{ $t('attractions.reservation') }}:</strong>
+              <template v-if="reservationPrimaryParts">
+                {{ reservationPrimaryParts.before }}
+                <a :href="'tel:' + reservationPrimaryParts.phone.replace(/[^0-9+]/g,'')">{{ reservationPrimaryParts.phone }}</a>
+                {{ reservationPrimaryParts.after }}
+              </template>
+              <template v-else>
+                {{ primaryReservation }}
+              </template>
+            </span>
+          </p>
+          <p v-if="secondaryReservation" class="info-row info-secondary info-content-offset">
+            <template v-if="reservationSecondaryParts">
+              {{ reservationSecondaryParts.before }}
+              <a :href="'tel:' + reservationSecondaryParts.phone.replace(/[^0-9+]/g,'')">{{ reservationSecondaryParts.phone }}</a>
+              {{ reservationSecondaryParts.after }}
+            </template>
+            <template v-else>
+              {{ secondaryReservation }}
+            </template>
+          </p>
         </div>
         
         <div class="content-grid">
@@ -246,6 +320,52 @@ const goBack = () => {
 
 .address-section strong {
   color: var(--primary-text-color);
+}
+
+.info-section {
+  padding: 0.5rem 0 1rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  color: var(--secondary-text-color);
+  margin: 0.4rem 0;
+}
+.info-row strong {
+  color: var(--primary-text-color);
+}
+.info-secondary {
+  color: var(--secondary-text-color);
+  font-size: 0.95rem;
+}
+
+.info-icon {
+  width: 1.3rem;
+  line-height: 1.3rem;
+  text-align: center;
+  margin-top: 0.1rem;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-content a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.info-content a:hover {
+  text-decoration: underline;
+}
+
+.info-content-offset {
+  /* align secondary line to text start without icon */
+  margin-left: calc(1.3rem + 0.5rem);
 }
 
 /* New Grid Layout */

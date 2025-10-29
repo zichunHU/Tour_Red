@@ -17,6 +17,10 @@ const attraction = ref({
   theme: [],
   address: '',
   address_en: '',
+  opening_hours: '',
+  opening_hours_en: '',
+  reservation: '',
+  reservation_en: '',
   summary: '',
   summary_en: '',
   description: '',
@@ -113,6 +117,22 @@ const handleSubmit = async () => {
       <div class="form-group">
         <label for="address_en">{{ t('attractions.addressEn') }}</label>
         <input id="address_en" v-model="attraction.address_en" type="text">
+      </div>
+      <div class="form-group">
+        <label for="opening_hours">{{ t('attractions.openingHoursZh') }}</label>
+        <input id="opening_hours" v-model="attraction.opening_hours" type="text">
+      </div>
+      <div class="form-group">
+        <label for="opening_hours_en">{{ t('attractions.openingHoursEn') }}</label>
+        <input id="opening_hours_en" v-model="attraction.opening_hours_en" type="text">
+      </div>
+      <div class="form-group">
+        <label for="reservation">{{ t('attractions.reservationZh') }}</label>
+        <input id="reservation" v-model="attraction.reservation" type="text">
+      </div>
+      <div class="form-group">
+        <label for="reservation_en">{{ t('attractions.reservationEn') }}</label>
+        <input id="reservation_en" v-model="attraction.reservation_en" type="text">
       </div>
       <div class="form-group">
         <label for="summary_zh">{{ t('attractions.summaryZh') }}</label>

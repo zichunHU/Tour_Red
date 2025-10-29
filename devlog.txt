@@ -422,3 +422,26 @@
 *   **[验证] 预览:** 打开 `http://localhost:5173/`，浏览器无错误；终端无新增错误日志。
 
 *   **结果:** 页面上的主题与区域已统一使用代码并通过 i18n 显示，减少硬编码，后续维护更顺畅；未改动景点详情与路线详情列表。
+
+---
+
+**日期:** 2025年10月29日 (续)
+**阶段:** 常量抽离（THEME_ICONS 统一至 constants）
+
+*   **[目的]** 将首页本地的 `THEME_ICONS` 图标映射抽离为可复用常量，保持与 `THEME_KEYS` 同源，减少重复维护。
+*   **[代码]**
+    *   新增：`frontend/src/constants/themeIcons.js`，导出 `THEME_ICONS`（与主题代码一一对应）。
+    *   更新：`frontend/src/views/HomePage.vue`，移除本地 `THEME_ICONS`，改为 `import { THEME_ICONS } from '../constants/themeIcons.js'`，`interestTags` 继续由 `THEME_KEYS` 驱动。
+*   **[验证]** 打开前端预览首页，主题卡片图标正常渲染，浏览器无错误。
+*   **[结果]** 图标映射统一由 `constants` 提供，复用性与一致性提升，后续页面可直接引用。
+
+**阶段:** 跨页面复用（主题筛选与详情采用 THEME_ICONS）
+
+*   **[目的]** 在主题筛选、个性化标签与详情页中统一展示主题图标，减少重复定义，提升一致性与易读性。
+*   **[代码]**
+    *   `frontend/src/views/AttractionListPage.vue`：筛选下拉的主题选项展示 `THEME_ICONS[theme] + $t('themes.theme')`。
+    *   `frontend/src/views/PersonalizationPage.vue`：`TagChip` 标签展示 `THEME_ICONS[tag] + $t('themes.tag')`。
+    *   `frontend/src/views/AttractionDetailPage.vue`：详情页标签区域本地化并添加主题图标；区域标签使用 `$t('areas.area')`。
+    *   `frontend/src/views/RouteDetailPage.vue`：路线详情页的主题标签展示图标 + 本地化名称。
+*   **[验证]** 前端预览打开后，以上页面渲染正常，浏览器无错误；主题图标在筛选、标签与详情场景下正确显示。
+*   **[结果]** THEME_ICONS 在多页面中统一复用，视觉与语义一致，后续新增页面可直接引用常量，无需重复定义。

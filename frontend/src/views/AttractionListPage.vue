@@ -14,6 +14,7 @@ const selectedTheme = ref('')
 
 // Unified options from catalog (codes mapped to i18n for display)
 import { AREA_KEYS, THEME_KEYS } from '../constants/catalog.js'
+import { THEME_ICONS } from '../constants/themeIcons.js'
 const areaOptions = AREA_KEYS
 const themeOptions = THEME_KEYS
 
@@ -81,7 +82,7 @@ const handleReset = () => {
         </select>
         <select v-model="selectedTheme">
           <option value="">{{ $t('attractions.allThemes') }}</option>
-          <option v-for="theme in themeOptions" :key="theme" :value="theme">{{ $t(`themes.${theme}`) }}</option>
+          <option v-for="theme in themeOptions" :key="theme" :value="theme">{{ THEME_ICONS[theme] }} {{ $t(`themes.${theme}`) }}</option>
         </select>
       </div>
       <div class="filter-group">

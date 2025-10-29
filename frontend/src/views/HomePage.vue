@@ -15,6 +15,7 @@ import 'swiper/css/autoplay';
 // import required modules
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { THEME_KEYS } from '../constants/catalog.js'
+import { THEME_ICONS } from '../constants/themeIcons.js'
 
 const router = useRouter();
 const { t } = useI18n()
@@ -26,20 +27,7 @@ const loading = ref(true);
 const error = ref(null);
 const heroCurrentSlideIndex = ref(0);
 
-// Theme icons mapping (keys align with THEME_KEYS)
-const THEME_ICONS = {
-  '建党伟业': '🏛️',
-  '革命足迹': '👣',
-  '工人运动': '✊',
-  '革命烈士': '🕯️',
-  '抗日战争': '🛡️',
-  '伟人故居': '🏠',
-  '文化名人': '✒️',
-  '地标': '🏙️',
-  '观光': '🧭',
-  '古典园林': '🌿',
-  '历史': '📜'
-}
+// THEME_ICONS imported from constants to keep mapping reusable
 
 // Drive theme cards from THEME_KEYS to avoid duplication
 const interestTags = computed(() => THEME_KEYS.map(code => ({ code, icon: THEME_ICONS[code] || '🏷️' })))

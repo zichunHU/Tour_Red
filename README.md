@@ -207,6 +207,110 @@ Tour/
     -   组件将数据保存到其内部状态中。
     -   Vue 的响应式系统自动更新 DOM，将景点列表渲染到页面上。
 
+## 数据结构与接口
+
+下面梳理项目的后端数据结构（JSON 存储）、前端代码表与约束，以及完整的 REST API 端点，便于数据维护与联调。
+
+### 数据存储概览（后端 JSON）
+
+- 目录位置：`backend/data/`
+- 景点：`backend/data/attractions/<dir_name>/data.json`，同目录存放图片文件。
+- 路线：`backend/data/routes.json`
+- 用户：`backend/data/users.json`（预留，当前为空数组）。
+
+### 景点数据结构（`data.json`）
+
+字段说明（不同景点可能存在可选字段）：
+
+- `id`：整数，唯一标识（后端在创建时分配）。
+- `name` / `name_en`：中/英文名称。
+- `area`：行政区名称（应来自前端 `AREA_KEYS`）。
+- `theme`：主题数组（每项应来自前端 `THEME_KEYS`）。
+- `rating`：可选，评分（示例中存在）。
+- `address`：地址字符串。
+- `description` / `description_en`：详情文本，支持基础 HTML/Markdown，后端会用 `bleach` 做白名单清洗并将相对图片地址补全为绝对路径。
+- `image_url`：主图 URL，若为相对路径，后端返回前会补全为绝对 URL。
+- `location`：地理坐标对象 `{ latitude, longitude }`，用于路线生成与距离计算；在创建/更新时如提供 `address`，后端会尝试调用高德地理编码写入。
+- `dir_name`：目录名（slug），用于静态资源路径与删除操作（后端在创建时生成）。
+
+示例（摘自 `yu-garden/data.json`）：
+
+```json
+{
+  "name": "豫园",
+  "name_en": "Yu Garden",
+  "area": "黄浦区",
+  "theme": ["古典园林", "历史"],
+  "address": "上海市黄浦区福佑路168号",
+  "description": "豫园是位于上海市黄浦区的一座明代江南古典私家园林，始建于明代嘉靖、万历年间。",
+  "description_en": "Yu Garden or Yuyuan Garden is an extensive Chinese garden located...",
+  "image_url": "http://127.0.0.1:5000/static/attractions/yu-garden/IMG20250827131913_1761044625.jpg",
+  "location": { "latitude": 31.227761, "longitude": 121.492502 },
+  "id": 5,
+  "dir_name": "yu-garden"
+}
+```
+
+### 路线数据结构（`routes.json`）
+
+- `id`：整数，唯一标识。
+- `name` / `name_en`：路线名称（中/英）。
+- `description` / `description_en`：路线简介（中/英）。
+- `theme`：字符串（如“一日游”、“半日游”）。
+- `attraction_ids`：整型 ID 数组，指向景点集合。
+
+示例（节选）：
+
+```json
+{
+  "id": 3,
+  "name": "上海经典一日游",
+  "name_en": "Classic Shanghai One-Day Tour",
+  "description": "本路线带您领略上海最具代表性的两个景点...",
+  "description_en": "This route shows you two of the most representative attractions...",
+  "theme": "一日游",
+  "attraction_ids": [4, 5]
+}
+```
+
+### 前端代码表与约束
+
+- 主题代码表：`frontend/src/constants/catalog.js` 的 `THEME_KEYS`。示例：`["建党伟业", "革命足迹", "工人运动", "革命烈士", "抗日战争", "伟人故居", "文化名人", "地标", "观光", "古典园林", "历史"]`
+- 区域代码表：同文件的 `AREA_KEYS`。示例：`["黄浦区", "徐汇区", "长宁区", "静安区", "普陀区", "虹口区", "杨浦区"]`
+- 约束：后端 `area`、`theme` 字段建议仅使用以上代码表中的值，以保证筛选与展示一致性。
+- i18n：词典位于 `frontend/src/locales/zh-CN.json` 与 `en-US.json`；前端文案统一通过 `useI18n().t(key)` 获取。首页轮播副标题兜底使用键 `home.subtitle`。
+
+### 图片与富文本处理
+
+- 上传接口：`POST /api/attractions/<id>/images`，表单键：`file`；返回 `{"imageUrl": "http://..."}`。
+- 描述内容中的相对图片链接会在后端被补全为绝对 URL；HTML 内容在保存时会按白名单进行清洗（允许 `p/br/strong/em/u/h1-h6/ol/ul/li/a/img/blockquote` 等标签）。
+
+### REST API 概览
+
+景点（前缀：`/api/attractions`）
+- `GET /`：查询景点，支持 `keyword`、`area`、`theme` 过滤。
+- `GET /<id>`：获取景点详情。
+- `POST /`：创建景点；支持地址地理编码与 `dir_name` 生成。
+- `PUT /<id>`：更新景点；对 `description(_en)` 富文本进行清洗；地址变更自动地理编码。
+- `DELETE /<id>`：删除景点（移除对应目录）。
+- `POST /<id>/images`：上传景点图片，返回可公开访问的图片 URL。
+
+路线（前缀：`/api/routes`）
+- `GET /`：获取所有路线。
+- `GET /<id>`：获取路线详情，并携带 `attractions` 详细对象列表（由 `attraction_ids` 解析）。
+- `POST /generate`：根据提交的 `attraction_ids` 使用最近邻算法生成临时路线顺序；返回对象包含 `attractions` 详情列表（不落盘）。
+- `POST /`：创建路线。
+- `PUT /<id>`：更新路线。
+- `DELETE /<id>`：删除路线。
+
+### 数据维护建议
+
+- 保持 `id` 唯一且连续递增（由后端生成）。
+- `dir_name` 为英文 slug，需唯一（由后端根据 `name_en`/`name` 生成）。
+- 为参与路线生成的景点补齐 `location`；否则会被排除，影响生成结果。
+- 遵循前端代码表的 `area`、`theme` 值，避免自由文本导致筛选失效。
+- 图片尽量通过上传接口获取绝对 URL；或使用相对路径交由后端补全。
+
 ## 个性化定制与结果页
 
 -   **流程**：在 `PersonalizationPage.vue` 中，用户通过“兴趣选择 → 景点选择 → 生成路线”三步完成个性化路线的创建。

@@ -3,6 +3,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MapViewer from '../components/MapViewer.vue'
+import { THEME_ICONS } from '../constants/themeIcons.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -60,7 +61,7 @@ const goBack = () => {
         <button @click="goBack" class="back-button">&larr; {{ $t('common.back') }}</button>
         <h1>{{ routeData.name }}</h1>
         <p class="name-en">{{ routeData.name_en }}</p>
-        <span class="tag theme-tag">{{ routeData.theme }}</span>
+        <span class="tag theme-tag">{{ THEME_ICONS[routeData.theme] }} {{ $t(`themes.${routeData.theme}`) }}</span>
       </header>
 
       <div class="main-content-grid">

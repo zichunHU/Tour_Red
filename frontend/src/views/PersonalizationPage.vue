@@ -40,6 +40,7 @@ const step = ref('selection');
 
 // Step 1: Tag and Attraction Selection
 import { THEME_KEYS } from '../constants/catalog.js'
+import { THEME_ICONS } from '../constants/themeIcons.js'
 const interestTags = ref(THEME_KEYS);
 const selectedTags = ref([]);
 const allAttractions = ref([]);
@@ -142,7 +143,7 @@ function startOver() {
             :key="tag"
             :selected="selectedTags.includes(tag)"
             @toggle="() => { const i = selectedTags.indexOf(tag); if (i >= 0) selectedTags.splice(i,1); else selectedTags.push(tag); }"
-          >{{ $t(`themes.${tag}`) }}</TagChip>
+          >{{ THEME_ICONS[tag] }} {{ $t(`themes.${tag}`) }}</TagChip>
         </div>
       </div>
 

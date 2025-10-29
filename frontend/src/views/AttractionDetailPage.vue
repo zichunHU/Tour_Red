@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MapViewer from '../components/MapViewer.vue' // 导入地图组件
+import { THEME_ICONS } from '../constants/themeIcons.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -52,8 +53,8 @@ const goBack = () => {
 
       <section class="detail-content">
         <div class="tags">
-          <span class="tag area-tag">{{ attraction.area }}</span>
-          <span v-for="theme in attraction.theme" :key="theme" class="tag theme-tag">{{ theme }}</span>
+          <span class="tag area-tag">{{ $t(`areas.${attraction.area}`) }}</span>
+          <span v-for="theme in attraction.theme" :key="theme" class="tag theme-tag">{{ THEME_ICONS[theme] }} {{ $t(`themes.${theme}`) }}</span>
         </div>
 
         <div v-if="attraction.address" class="address-section">
